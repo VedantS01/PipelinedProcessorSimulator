@@ -8,6 +8,7 @@
 #include <cstdio>
 #include <climits>
 #include <conio.h>
+#include <fstream>
 
 #define int8 int8_t
 #define NUM_REGS 16
@@ -47,6 +48,7 @@ class IFModule {
     public:             //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     Register pc;
     IFIDBuffer execute(/* args */);
+    ICache I$;
 };
 
 class IDEXBuffer {
@@ -105,5 +107,5 @@ class Processor {
     //more data
 
     //methods
-    
+    void setup(ifstream &, ifstream &, ifstream &);
 };
