@@ -4,11 +4,14 @@
  *  NOTE            :       DEVELOPEMENT STAGE
  **/
 
+#ifndef PROCESSOR_H
+#define PROCESSOR_H
+
 #include <iostream>
 #include <cstdio>
 #include <climits>
-#include <conio.h>
 #include <fstream>
+using namespace std;
 
 #define int8 int8_t
 #define int16 int16_t
@@ -38,12 +41,14 @@ class PC {
 class RegisterFile {
     public:
     Register R[NUM_REGS];
-    flag read1;
-    flag read2;
-    flag write;
+    flag fread1;
+    flag fread2;
+    flag fwrite;
     int8 read();
     void write(int rPos, int8 _val);
-    RegisterFile();
+    RegisterFile(){
+        fread1 = fread2 = fwrite = false;
+    }
 };
 
 class Block {
@@ -136,3 +141,5 @@ class Processor {
     //methods
     void setup(ifstream &, ifstream &, ifstream &);
 };
+
+#endif

@@ -13,7 +13,8 @@
 using namespace std;
 
 IFIDBuffer IFModule::execute() {
-    int8 v = pc.read();
+    //int8 v = pc.read();
+    int8 v = pc.val;
     int16 instruction = I$.request(v);
     //npc.increment();
     npc.val = v + 2;
@@ -22,4 +23,5 @@ IFIDBuffer IFModule::execute() {
     }
     IFIDBuffer buf;
     buf.set(npc.val, instruction);
+    return buf;
 }
