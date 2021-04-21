@@ -15,6 +15,11 @@
 #define NUM_REGS 16
 #define flag bool
 
+#define IWIDTH 16
+#define DWIDTH 8
+#define NUMSETS 64
+#define BLOCK_SIZE 4
+
 class Register {
     public:
     int8 val;
@@ -24,9 +29,9 @@ class Register {
 
 class PC {
     public:
-    int16 val;
-    int16 read();
-    void write(int16 _val);
+    int8 val;
+    int8 read();
+    void write(int8 _val);
     void increment();
 };
 
@@ -41,9 +46,15 @@ class RegisterFile {
     RegisterFile();
 };
 
+class Block {
+    public:
+    int8 offset[BLOCK_SIZE];
+};
+
 class ICache {
     public:
-    
+    Block data[NUMSETS];
+    int16 request(int8);
 };
 
 class DCache {
@@ -51,14 +62,20 @@ class DCache {
 };
 
 class IFIDBuffer {
-
+    public:
+    int8 npcVal;
+    int16 instruction;
+    void set(int8, int16);
+    int8 getNPC();
+    int16 getInstruction();
 };
 
 class IFModule {
     public:             //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
-    Register pc;
+    PC pc;
     IFIDBuffer execute(/* args */);
     ICache I$;
+    PC npc;
 };
 
 class IDEXBuffer {

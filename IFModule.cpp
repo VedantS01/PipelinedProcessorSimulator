@@ -1,5 +1,5 @@
 /**
- *  Processor.cpp   :       Implements the class IFModule
+ *  IFModule.cpp    :       Implements the class IFModule
  * 
  *  Version         :       1.0
  *  Author          :       Vedant Ashish Saboo
@@ -13,5 +13,13 @@
 using namespace std;
 
 IFIDBuffer IFModule::execute() {
-    //I$.request(pc.val);
+    int8 v = pc.read();
+    int16 instruction = I$.request(v);
+    //npc.increment();
+    npc.val = v + 2;
+    if(npc.val >= 256) {
+        npc.val = npc.val - 256;
+    }
+    IFIDBuffer buf;
+    buf.set(npc.val, instruction);
 }
