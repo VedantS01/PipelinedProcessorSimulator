@@ -4,20 +4,39 @@
  *  NOTE            :       DEVELOPEMENT STAGE
  **/
 
-class Register {
+#include <iostream>
+#include <cstdio>
+#include <climits>
+#include <conio.h>
 
+#define int8 int8_t
+#define NUM_REGS 16
+#define flag bool
+
+class Register {
+    public:
+    int8 val;
+    int8 read();
+    void write(int8 _val); //_val is well inside 8 bits
 };
 
 class RegisterFile {
-
+    public:
+    Register R[NUM_REGS];
+    flag read1;
+    flag read2;
+    flag write;
+    int8 read();
+    void write(int rPos, int8 _val);
+    RegisterFile();
 };
 
 class ICache {
-
+    public:
 };
 
 class DCache {
-
+    public:
 };
 
 class IFIDBuffer {
