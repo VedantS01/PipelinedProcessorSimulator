@@ -11,6 +11,7 @@
 #include <fstream>
 
 #define int8 int8_t
+#define int16 int16_t
 #define NUM_REGS 16
 #define flag bool
 
@@ -19,6 +20,14 @@ class Register {
     int8 val;
     int8 read();
     void write(int8 _val); //_val is well inside 8 bits
+};
+
+class PC {
+    public:
+    int16 val;
+    int16 read();
+    void write(int16 _val);
+    void increment();
 };
 
 class RegisterFile {
@@ -34,6 +43,7 @@ class RegisterFile {
 
 class ICache {
     public:
+    
 };
 
 class DCache {
