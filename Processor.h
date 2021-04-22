@@ -23,61 +23,72 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
-class Register {
-    public:
+class Register
+{
+public:
     int8 val;
     int8 read();
     void write(int8 _val); //_val is well inside 8 bits
 };
 
-class Register16 {
-    public:
+class Register16
+{
+public:
     int16 val;
     int16 read();
     void write(int16 _val); //_val is well inside 8 bits
 };
 
-class PC {
-    public:
+class PC
+{
+public:
     int8 val;
     int8 read();
     void write(int8 _val);
     void increment();
 };
 
-class RegisterFile {
-    public:
+class RegisterFile
+{
+public:
+    bool request_failed;
     Register R[NUM_REGS];
     flag fread1;
     flag fread2;
     flag fwrite;
-    int8 read();
+    int8 read(int rPos);
     void write(int rPos, int8 _val);
-    RegisterFile(){
+    RegisterFile()
+    {
+        request_failed = false;
         fread1 = fread2 = fwrite = false;
     }
 };
 
-class Block {
-    public:
+class Block
+{
+public:
     int8 offset[BLOCK_SIZE];
 };
 
-class ICache {
-    public:
+class ICache
+{
+public:
     Block data[NUMSETS];
     int16 request(int8);
 };
 
-class DCache {
-    public:
+class DCache
+{
+public:
     Block data[NUMSETS];
     int8 request(int8);
     void write(int8, int8);
 };
 
-class IFIDBuffer {
-    public:
+class IFIDBuffer
+{
+public:
     int8 npcVal;
     int16 instruction;
     void set(int8, int16);
@@ -85,53 +96,58 @@ class IFIDBuffer {
     int16 getInstruction();
 };
 
-class IFModule {
-    public:             //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
+class IFModule
+{
+public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
     IFIDBuffer execute(/* args */);
     ICache &I$;
     PC npc;
 };
 
-class IDEXBuffer {
-
+class IDEXBuffer
+{
 };
 
-class IDRFModule {
-    public:
+class IDRFModule
+{
+public:
     RegisterFile &rf;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */);
 };
 
-class EMBuffer {
-
+class EMBuffer
+{
 };
 
-class ALU {
-
+class ALU
+{
 };
 
-class EXModule {
-    public:
+class EXModule
+{
+public:
     ALU &alu;
     IDEXBuffer idexBuf;
     EMBuffer execute(/* args */);
 };
 
-class MWBuffer {
-    
+class MWBuffer
+{
 };
 
-class MEMModule {
-    public:
+class MEMModule
+{
+public:
     DCache &D$;
     EMBuffer emBuf;
     MWBuffer execute(/* args */);
 };
 
-class WBModule {
-    public:
+class WBModule
+{
+public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
@@ -139,12 +155,13 @@ class WBModule {
     void execute(/* args */);
 };
 
-class ControlUnit {
-
+class ControlUnit
+{
 };
 
-class Processor {
-    public:
+class Processor
+{
+public:
     ControlUnit CU;
     ICache I$;
     DCache D$;
