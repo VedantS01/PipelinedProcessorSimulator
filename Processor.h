@@ -144,22 +144,19 @@ public:
     bool resolveBranch(int);
 };
 
-class EXMBuffer
+class EMBuffer
 {
     public:
-<<<<<<< HEAD
     int aluOutput;
     flag load;
     flag store;
     flag writeToRegister;
     int dest;
-=======
     int memTarget;
     int val;
     void set(int,int);
     int getTarget();
     int getValue();
->>>>>>> a1c9caf288541e3a932eb1112349b5636068f0f0
 };
 
 class ALU
