@@ -21,13 +21,36 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
         finI >> hex >> I$.data[i].offset[3];
     }
 
+    //ofstream fout;
+    /*
+    fout.open("debugi.txt");
+    for(int i = 0; i < NUMSETS; i++) {
+        fout << hex << I$.data[i].offset[0] << endl;
+        fout << hex << I$.data[i].offset[1] << endl;
+        fout << hex << I$.data[i].offset[2] << endl;
+        fout << hex << I$.data[i].offset[3] << endl;
+    }
+    fout.close();
+    */
+
     //read dcache values
     for(int i = 0; i < NUMSETS; i++) {
-        finD >> hex >> I$.data[i].offset[0];
-        finD >> hex >> I$.data[i].offset[1];
-        finD >> hex >> I$.data[i].offset[2];
-        finD >> hex >> I$.data[i].offset[3];
+        finD >> hex >> D$.data[i].offset[0];
+        finD >> hex >> D$.data[i].offset[1];
+        finD >> hex >> D$.data[i].offset[2];
+        finD >> hex >> D$.data[i].offset[3];
     }
+
+    /*
+    fout.open("debugd.txt");
+    for(int i = 0; i < NUMSETS; i++) {
+        fout << hex << D$.data[i].offset[0] << endl;
+        fout << hex << D$.data[i].offset[1] << endl;
+        fout << hex << D$.data[i].offset[2] << endl;
+        fout << hex << D$.data[i].offset[3] << endl;
+    }
+    fout.close();
+    */
 
     //read register file values
     int8 v;

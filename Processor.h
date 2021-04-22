@@ -64,6 +64,9 @@ class ICache {
 
 class DCache {
     public:
+    Block data[NUMSETS];
+    int8 request(int8);
+    void write(int8, int8);
 };
 
 class IFIDBuffer {
