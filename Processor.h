@@ -30,6 +30,13 @@ class Register {
     void write(int8 _val); //_val is well inside 8 bits
 };
 
+class Register16 {
+    public:
+    int16 val;
+    int16 read();
+    void write(int16 _val); //_val is well inside 8 bits
+};
+
 class PC {
     public:
     int8 val;
@@ -80,9 +87,9 @@ class IFIDBuffer {
 
 class IFModule {
     public:             //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
-    PC pc;
+    PC &pc;
     IFIDBuffer execute(/* args */);
-    ICache I$;
+    ICache &I$;
     PC npc;
 };
 
@@ -92,7 +99,7 @@ class IDEXBuffer {
 
 class IDRFModule {
     public:
-    RegisterFile rf;
+    RegisterFile &rf;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */);
 };
@@ -107,7 +114,7 @@ class ALU {
 
 class EXModule {
     public:
-    ALU alu;
+    ALU &alu;
     IDEXBuffer idexBuf;
     EMBuffer execute(/* args */);
 };
@@ -118,7 +125,7 @@ class MWBuffer {
 
 class MEMModule {
     public:
-    DCache D$;
+    DCache &D$;
     EMBuffer emBuf;
     MWBuffer execute(/* args */);
 };
@@ -126,6 +133,9 @@ class MEMModule {
 class WBModule {
     public:
     MWBuffer mwBuf;
+    RegisterFile &rf;
+    DCache &D$;
+    //ICache &I$;
     void execute(/* args */);
 };
 
@@ -139,10 +149,28 @@ class Processor {
     ICache I$;
     DCache D$;
     RegisterFile rf;
+    PC pc;
+    Register16 IR;
+    IFModule IF;
+    IFIDBuffer IFID;
+    IDRFModule IDRF;
+    IDEXBuffer IDEX;
+    EXModule EX;
+    EMBuffer EM;
+    MEMModule MEM;
+    MWBuffer MW;
+    WBModule WB;
+    ALU alu;
+    flag HALT_SIGNAL;
+    flag COMPLETE;
+    int clock_cycle;
+
     //more data
 
     //methods
     void setup(ifstream &, ifstream &, ifstream &);
+    void startup();
+    void cycle();
 };
 
 #endif

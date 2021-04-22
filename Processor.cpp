@@ -59,4 +59,45 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
         //rf.write(i,v);
         rf.R[i].val = v;
     }
+
+    //set up modules
+    //IF Module initialisations
+    IF.I$ = I$;
+    IF.pc = pc;
+    
+    //IDRFModule initialisations
+    IDRF.rf = rf;
+
+    //EX Module initialisations
+    EX.alu = alu;
+
+    //MEM Module initialisations
+    MEM.D$ = D$;
+
+    //WB Module initialisations
+    WB.D$ = D$;
+    //WB.I$ = I$;
+    WB.rf = rf;
+    
+}
+
+void Processor::startup() {
+    pc.val = 0;
+    HALT_SIGNAL = false;
+    COMPLETE = false;
+    clock_cycle = 0;
+    while (!COMPLETE) {
+        cycle();
+    }
+    
+}
+
+void Processor::cycle() {
+    //processor clock cycle
+    clock_cycle++;
+    IFID = IF.execute();
+    IDEX = IDRF.execute();
+    EM = EX.execute();
+    MW = MEM.execute();
+    WB.execute();
 }
