@@ -12,15 +12,15 @@
 #include <iostream>
 using namespace std;
 
-void EXMBuffer::set(int target, int value) {
+void EMBuffer::set(int target, int value) {
     memTarget = target;
     val = value;
 }
 
-int EXMBuffer::getTarget() {
+int EMBuffer::getTarget() {
     return memTarget;
 }
 
-int EXMBuffer::targetValue() {
-    return value;
+int EMBuffer::getValue() {
+    return val;
 }
