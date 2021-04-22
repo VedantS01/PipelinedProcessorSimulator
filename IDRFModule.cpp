@@ -20,28 +20,74 @@ IDEXBuffer IDRFModule::execute() {
     int subop = opcode & 3;
     IDEXBuffer buf;
     if(mode == 0) {
-        //buf.athmetic = 1;
-        //buf.subop = subop;
-        //fetch r
+        buf.arithmetic = 1;
+        buf.subop = subop;
+        rf.getBusy();
+        rf.reset();
+        int destA = (instruction >> 8) & 0xf;
+        int src1A = (instruction >> 4) & 0xf;
+        int src2A = instruction & 0xf;
+        buf.src2 = rf.read(src2A);
+        buf.src1 = rf.read(src1A);
+        buf.dest = destA;
     } else if(mode == 1) {
-        //buf.logical = 1;
-        //buf.subop = subop;
-        //fetch r
+        buf.logical = 1;
+        buf.subop = subop;
+        rf.getBusy();
+        rf.reset();
+        int destA = (instruction >> 8) & 0xf;
+        int src1A = (instruction >> 4) & 0xf;
+        int src2A = instruction & 0xf;
+        buf.src2 = rf.read(src2A);
+        buf.src1 = rf.read(src1A);
+        buf.dest = destA;
     } else if(mode == 2) {
         if(subop == 0) {
-            //fetch r, m addr
-            //buf.writer = true
+            buf.load = true;
+            rf.getBusy();
+            rf.reset();
+            int destA = (instruction >> 8) & 0xf;
+            int src1A = (instruction >> 4) & 0xf;
+            int src2A = instruction & 0xf;
+            int s = src2A >> 3;
+            buf.src2 = signExtend(src2A, s);
+            buf.src1 = rf.read(src1A);
+            buf.dest = destA;
         } else if(subop == 1) {
-            //fetch r, m addr
-            //buf.writem = true
+            buf.store = true;
+            rf.getBusy();
+            rf.reset();
+            int destA = (instruction >> 8) & 0xf;
+            int src1A = (instruction >> 4) & 0xf;
+            int src2A = instruction & 0xf;
+            int s = src2A >> 3;
+            buf.src2 = signExtend(src2A, s);
+            buf.src1 = rf.read(src1A);
+            buf.dest = destA;
         } else if(subop == 2) {
-            //fetch m addr
-            //buf.jump = 1
+            buf.addr = (instruction >> 4) & 0xff;
+            buf.jump = true;
+            //branch issues;
         } else {
-            //fetch r, m addr
-            //buf.jump = 2
+            buf.addr = instruction & 0xff;
+            int destA = (instruction >> 8) & 0xf;
+            rf.getBusy();
+            rf.reset();
+            int dest = rf.read(destA);
+            buf.jump = resolveBranch(dest);
+            buf.dest = dest;
         }
     } else if(mode == 3) {
         //issue halt signal
+        buf.HALT_SIGNAL = true;
     }
+    return buf;
+}
+
+int signExtend(int x, int s) {
+    return ((s<<7)|(s<<6)|(s<<5)|(s<<4)|x);
+}
+
+bool IDRFModule::resolveBranch(int reg) {
+    return (reg == rf.read(0));
 }
