@@ -144,8 +144,14 @@ public:
     bool resolveBranch(int);
 };
 
-class EMBuffer
+class EXMBuffer
 {
+    public:
+    int memTarget;
+    int val;
+    void set(int,int);
+    int getTarget();
+    int getValue();
 };
 
 class ALU
