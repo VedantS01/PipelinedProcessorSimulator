@@ -146,6 +146,12 @@ public:
 
 class EMBuffer
 {
+    public:
+    int aluOutput;
+    flag load;
+    flag store;
+    flag writeToRegister;
+    int dest;
 };
 
 class ALU
@@ -171,6 +177,7 @@ public:
     MEMModule(DCache& _D$): D$(_D$){}
     DCache &D$;
     EMBuffer emBuf;
+    Register LMD;
     MWBuffer execute(/* args */){}
 };
 
