@@ -58,8 +58,12 @@ public:
     flag fread1;
     flag fread2;
     flag fwrite;
+    flag busy;
     int read(int rPos);
     void write(int rPos, int _val);
+    void reset();
+    void getBusy();
+    void relax();
     RegisterFile();
 };
 
@@ -95,6 +99,7 @@ class IFIDBuffer
 public:
     int npcVal;
     int instruction;
+    flag invalid;
     void set(int, int);
     int getNPC();
     int getInstruction();
@@ -112,6 +117,20 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
 
 class IDEXBuffer
 {
+    public:
+    flag invalid;
+    flag arithmetic;
+    flag logical;
+    int subop;
+    int src1;
+    int src2;
+    int dest;
+    flag load;
+    flag store;
+    int addr;
+    flag jump;
+    flag HALT_SIGNAL;
+    //IDEXBuffer(flag& h):HALT_SIGNAL(h) {}
 };
 
 class IDRFModule
@@ -122,6 +141,7 @@ public:
     DCache &D$;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */){}
+    bool resolveBranch(int);
 };
 
 class EMBuffer
@@ -136,7 +156,7 @@ class EXModule
 {
 public:
     ALU &alu;
-    EXModule(ALU& _alu) : alu(_alu){}
+    EXModule(ALU& _alu) : alu(_alu) {}
     IDEXBuffer idexBuf;
     EMBuffer execute(/* args */){}
 };

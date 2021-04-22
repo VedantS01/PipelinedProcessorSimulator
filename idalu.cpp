@@ -102,7 +102,7 @@ struct exbuffer hlt(struct idbuffer idbuf)
 
 struct idbuffer instructiondecode(int n)
 {
-    int dummyn=n;
+    int dummy = n;
     int op3 = n%16;
     n/=16;
     int op2 = n%16;

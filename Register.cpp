@@ -67,4 +67,21 @@ RegisterFile::RegisterFile()
 {
     request_failed = false;
     fread1 = fread2 = fwrite = false;
+    busy = false;
+}
+
+void RegisterFile::reset()
+{
+    request_failed = false;
+    fread1 = fread2 = fwrite = false;
+}
+
+void RegisterFile::getBusy()
+{
+    busy = true;
+}
+
+void RegisterFile::relax()
+{
+    busy = false;
 }

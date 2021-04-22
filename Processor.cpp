@@ -99,11 +99,20 @@ void Processor::startup() {
 void Processor::cycle() {
     //processor clock cycle
     clock_cycle++;
-    IFID = IF.execute();
-    //IDEX = IDRF.execute();
-    //EM = EX.execute();
-    //MW = MEM.execute();
-    //WB.execute();
+    int stages_active = 0;
+    if(!HALT_SIGNAL) {
+        IFID = IF.execute();
+        stages_active++;
+    } else {
+        IFID.invalid = true;
+    }
+    IDEX = IDRF.execute();
+    HALT_SIGNAL = IDEX.HALT_SIGNAL;
+    EM = EX.execute();
+    MW = MEM.execute();
+    WB.execute();
+
+
     if(clock_cycle == 10) {
         HALT_SIGNAL = true;
         COMPLETE = true;
