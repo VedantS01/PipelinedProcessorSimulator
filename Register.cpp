@@ -1,5 +1,5 @@
 /**
- *  ICache.cpp      :       Implements the class Register
+ *  Register.cpp    :       Implements the class Register
  * 
  *  Version         :       1.0
  *  Author          :       Sanchit Gupta
@@ -12,27 +12,27 @@
 #include <iostream>
 using namespace std;
 
-int8 Register::read()
+int Register::read()
 {
     return val;
 }
 
-void Register::write(int8 _val)
+void Register::write(int _val)
 {
     val = _val;
 }
 
-int16 Register16::read()
+int Register16::read()
 {
     return val;
 }
 
-void Register16::write(int16 _val)
+void Register16::write(int _val)
 {
     val = _val;
 }
 
-int8 RegisterFile::read(int rPos)
+int RegisterFile::read(int rPos)
 {
     if (fread1 == true && fread2 == true)
     {
@@ -50,7 +50,7 @@ int8 RegisterFile::read(int rPos)
     }
 }
 
-void RegisterFile::write(int rPos, int8 _val)
+void RegisterFile::write(int rPos, int _val)
 {
     if (fwrite == true)
     {
@@ -61,4 +61,10 @@ void RegisterFile::write(int rPos, int8 _val)
         fwrite = true;
         R[rPos].write(_val);
     }
+}
+
+RegisterFile::RegisterFile()
+{
+    request_failed = false;
+    fread1 = fread2 = fwrite = false;
 }

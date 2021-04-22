@@ -13,14 +13,12 @@
 using namespace std;
 
 IFIDBuffer IFModule::execute() {
-    //int8 v = pc.read();
-    int8 v = pc.val;
-    int16 instruction = I$.request(v);
-    //npc.increment();
-    npc.val = v + 2;
-    if(npc.val >= 256) {
-        npc.val = npc.val - 256;
-    }
+    int v = pc.read();
+    //int v = pc.val;
+    //cout << "in if module, addr is " << pc.val << endl; 
+    int instruction = I$.request(v);
+    npc.write(v);
+    npc.increment();
     IFIDBuffer buf;
     buf.set(npc.val, instruction);
     return buf;

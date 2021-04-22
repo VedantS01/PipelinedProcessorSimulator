@@ -12,14 +12,14 @@
 #include <iostream>
 using namespace std;
 
-int8 DCache::request(int8 addr) {
+int DCache::request(int addr) {
     int set = addr >> 2;
     int offset = addr & 3;
-    int8 little = data[set].offset[offset];
+    int little = data[set].offset[offset];
     return little;
 }
 
-void DCache::write(int8 addr, int8 item){
+void DCache::write(int addr, int item){
     int set = addr >> 2;
     int offset = addr & 3;
     data[set].offset[offset] = item;

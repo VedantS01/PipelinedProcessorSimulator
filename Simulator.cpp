@@ -18,4 +18,6 @@ int main() {
     finD.open(DFILE);
     finR.open(RFILE);
     processor.setup(finI, finD, finR);
+    processor.startup();
+    //processor.testicache();
 }

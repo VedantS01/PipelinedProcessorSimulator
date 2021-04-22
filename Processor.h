@@ -14,7 +14,9 @@
 using namespace std;
 
 #define int8 int8_t
+#define uint8 uint8_t
 #define int16 int16_t
+#define uint16 uint16_t
 #define NUM_REGS 16
 #define flag bool
 
@@ -26,25 +28,25 @@ using namespace std;
 class Register
 {
 public:
-    int8 val;
-    int8 read();
-    void write(int8 _val); //_val is well inside 8 bits
+    int val;
+    int read();
+    void write(int _val); //_val is well inside 8 bits
 };
 
 class Register16
 {
 public:
-    int16 val;
-    int16 read();
-    void write(int16 _val); //_val is well inside 8 bits
+    int val;
+    int read();
+    void write(int _val); //_val is well inside 8 bits
 };
 
 class PC
 {
 public:
-    int8 val;
-    int8 read();
-    void write(int8 _val);
+    int val;
+    int read();
+    void write(int _val);
     void increment();
 };
 
@@ -56,50 +58,53 @@ public:
     flag fread1;
     flag fread2;
     flag fwrite;
-    int8 read(int rPos);
-    void write(int rPos, int8 _val);
-    RegisterFile()
-    {
-        request_failed = false;
-        fread1 = fread2 = fwrite = false;
-    }
+    int read(int rPos);
+    void write(int rPos, int _val);
+    RegisterFile();
 };
 
-class Block
+class IBlock
 {
 public:
-    int8 offset[BLOCK_SIZE];
+    int offset[BLOCK_SIZE];
+};
+
+class DBlock
+{
+public:
+    int offset[BLOCK_SIZE];
 };
 
 class ICache
 {
 public:
-    Block data[NUMSETS];
-    int16 request(int8);
+    IBlock data[NUMSETS];
+    int request(int);
 };
 
 class DCache
 {
 public:
-    Block data[NUMSETS];
-    int8 request(int8);
-    void write(int8, int8);
+    DBlock data[NUMSETS];
+    int request(int);
+    void write(int, int);
 };
 
 class IFIDBuffer
 {
 public:
-    int8 npcVal;
-    int16 instruction;
-    void set(int8, int16);
-    int8 getNPC();
-    int16 getInstruction();
+    int npcVal;
+    int instruction;
+    void set(int, int);
+    int getNPC();
+    int getInstruction();
 };
 
 class IFModule
 {
 public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
+    IFModule(PC& _pc, ICache & _I$) : pc(_pc),I$(_I$) {}
     IFIDBuffer execute(/* args */);
     ICache &I$;
     PC npc;
@@ -112,9 +117,11 @@ class IDEXBuffer
 class IDRFModule
 {
 public:
+    IDRFModule(RegisterFile& _rf, DCache& _D$) : rf(_rf), D$(_D$) {}
     RegisterFile &rf;
+    DCache &D$;
     IFIDBuffer ifidBuf;
-    IDEXBuffer execute(/* args */);
+    IDEXBuffer execute(/* args */){}
 };
 
 class EMBuffer
@@ -129,8 +136,9 @@ class EXModule
 {
 public:
     ALU &alu;
+    EXModule(ALU& _alu) : alu(_alu){}
     IDEXBuffer idexBuf;
-    EMBuffer execute(/* args */);
+    EMBuffer execute(/* args */){}
 };
 
 class MWBuffer
@@ -140,9 +148,10 @@ class MWBuffer
 class MEMModule
 {
 public:
+    MEMModule(DCache& _D$): D$(_D$){}
     DCache &D$;
     EMBuffer emBuf;
-    MWBuffer execute(/* args */);
+    MWBuffer execute(/* args */){}
 };
 
 class WBModule
@@ -151,8 +160,9 @@ public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
+    WBModule(RegisterFile& _rf, DCache& _D$): rf(_rf), D$(_D$){}
     //ICache &I$;
-    void execute(/* args */);
+    void execute(/* args */){}
 };
 
 class ControlUnit
@@ -185,9 +195,13 @@ public:
     //more data
 
     //methods
+    Processor(): IF(pc, I$) , IDRF(rf, D$), EX(alu), MEM(D$), WB(rf, D$) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();
+
+    //test individual elements
+    void testicache();
 };
 
 #endif

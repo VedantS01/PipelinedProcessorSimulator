@@ -10,6 +10,8 @@
 
 #include "Processor.h"
 #include <fstream>
+#include <iomanip>
+#include <iostream>
 using namespace std;
 
 void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
@@ -53,13 +55,14 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
     */
 
     //read register file values
-    int8 v;
+    int v;
     for(int i = 1; i < 16; i++) {
         finR >> hex >> v;
         //rf.write(i,v);
         rf.R[i].val = v;
     }
 
+    /*
     //set up modules
     //IF Module initialisations
     IF.I$ = I$;
@@ -78,6 +81,7 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
     WB.D$ = D$;
     //WB.I$ = I$;
     WB.rf = rf;
+    */
     
 }
 
@@ -96,8 +100,48 @@ void Processor::cycle() {
     //processor clock cycle
     clock_cycle++;
     IFID = IF.execute();
-    IDEX = IDRF.execute();
-    EM = EX.execute();
-    MW = MEM.execute();
-    WB.execute();
+    //IDEX = IDRF.execute();
+    //EM = EX.execute();
+    //MW = MEM.execute();
+    //WB.execute();
+    if(clock_cycle == 10) {
+        HALT_SIGNAL = true;
+        COMPLETE = true;
+    }
+    pc.increment(); 
 }
+
+void Processor::testicache() {
+    ofstream fout;
+    fout.open("debugif.txt");
+    for(int i = 0; i < NUMSETS; i++) {
+        fout << hex << I$.data[i].offset[0] << endl;
+        fout << hex << I$.data[i].offset[1] << endl;
+        fout << hex << I$.data[i].offset[2] << endl;
+        fout << hex << I$.data[i].offset[3] << endl;
+    }
+    fout.close();
+}
+
+/*
+Processor::Processor() {
+    //set up modules
+    //IF Module initialisations
+    IF.I$ = I$;
+    IF.pc = pc;
+    
+    //IDRFModule initialisations
+    IDRF.rf = rf;
+
+    //EX Module initialisations
+    EX.alu = alu;
+
+    //MEM Module initialisations
+    MEM.D$ = D$;
+
+    //WB Module initialisations
+    WB.D$ = D$;
+    //WB.I$ = I$;
+    WB.rf = rf;
+}
+*/
