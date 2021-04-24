@@ -174,6 +174,14 @@ public:
     bool resolveBranch(int);
 };
 
+class EXModule
+{
+public:
+    IDEXBuffer idexbuf;
+    EXBuffer execute(IDEXBuffer);
+    
+};
+/*
 class EMBuffer
 {
 public:
@@ -207,6 +215,7 @@ public:
     IDEXBuffer idexBuf;
     EMBuffer execute(/* args */) {}
 };
+*/
 
 class MWBuffer
 {
