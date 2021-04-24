@@ -121,16 +121,39 @@ class IDEXBuffer
     flag invalid;
     flag arithmetic;
     flag logical;
-    int subop;
-    int src1;
-    int src2;
-    int dest;
     flag load;
     flag store;
-    int addr;
     flag jump;
     flag HALT_SIGNAL;
-    //IDEXBuffer(flag& h):HALT_SIGNAL(h) {}
+    int subop;
+
+    //npc, denotes the address of the current instrcution
+    int npc;
+
+    //in case of arithmetic and logic instructions, this is first operand
+    //in case of load store, this register is base
+    int src1;
+    int srcval1;
+    flag validsrc1; //will be used in operator forwarding
+
+    //in case of arithmetic and logic instructions, this is second operand
+    //in case of load store, src2 and srcval2 are not valid
+    int src2;
+    int srcval2; 
+    flag validsrc2; //will be used in operator forwarding
+
+
+    //will denote write_to register in arithmetic and logic operations and load instruction 
+    int dest;
+    //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
+    int destval;
+    int validdest; //will be used in operator forwarding
+
+    //in load store, offset stores the immediate 4 bit value of address offset
+    int offset;
+    
+    //stores jump offset in jump instructions
+    int jump_addr;
 };
 
 class IDRFModule
