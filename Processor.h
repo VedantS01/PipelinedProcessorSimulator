@@ -109,7 +109,7 @@ class IFModule
 {
 public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
-    IFModule(PC& _pc, ICache & _I$) : pc(_pc),I$(_I$) {}
+    IFModule(PC &_pc, ICache &_I$) : pc(_pc), I$(_I$) {}
     IFIDBuffer execute(/* args */);
     ICache &I$;
     PC npc;
@@ -117,7 +117,7 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
 
 class IDEXBuffer
 {
-    public:
+public:
     flag invalid;
     flag arithmetic;
     flag logical;
@@ -139,11 +139,10 @@ class IDEXBuffer
     //in case of arithmetic and logic instructions, this is second operand
     //in case of load store, src2 and srcval2 are not valid
     int src2;
-    int srcval2; 
+    int srcval2;
     flag validsrc2; //will be used in operator forwarding
 
-
-    //will denote write_to register in arithmetic and logic operations and load instruction 
+    //will denote write_to register in arithmetic and logic operations and load instruction
     int dest;
     //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
     int destval;
@@ -151,7 +150,7 @@ class IDEXBuffer
 
     //in load store, offset stores the immediate 4 bit value of address offset
     int offset;
-    
+
     //stores jump offset in jump instructions
     int jump_addr;
 };
@@ -159,17 +158,17 @@ class IDEXBuffer
 class IDRFModule
 {
 public:
-    IDRFModule(RegisterFile& _rf, DCache& _D$) : rf(_rf), D$(_D$) {}
+    IDRFModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$) {}
     RegisterFile &rf;
     DCache &D$;
     IFIDBuffer ifidBuf;
-    IDEXBuffer execute(/* args */){}
+    IDEXBuffer execute(/* args */) {}
     bool resolveBranch(int);
 };
 
 class EMBuffer
 {
-    public:
+public:
     int aluOutput;
     flag load;
     flag store;
@@ -177,7 +176,7 @@ class EMBuffer
     int dest;
     int memTarget;
     int val;
-    void set(int,int);
+    void set(int, int);
     int getTarget();
     int getValue();
 };
@@ -190,23 +189,30 @@ class EXModule
 {
 public:
     ALU &alu;
-    EXModule(ALU& _alu) : alu(_alu) {}
+    EXModule(ALU &_alu) : alu(_alu) {}
     IDEXBuffer idexBuf;
-    EMBuffer execute(/* args */){}
+    EMBuffer execute(/* args */) {}
 };
 
 class MWBuffer
 {
+public:
+    bool load;
+    bool aluInstr;
+    int dest;
+    int val;
+    int lmd;
+    bool invalid;
 };
 
 class MEMModule
 {
 public:
-    MEMModule(DCache& _D$): D$(_D$){}
+    MEMModule(DCache &_D$) : D$(_D$) {}
     DCache &D$;
     EMBuffer emBuf;
     Register LMD;
-    MWBuffer execute(/* args */){}
+    MWBuffer execute(/* args */) {}
 };
 
 class WBModule
@@ -215,9 +221,9 @@ public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
-    WBModule(RegisterFile& _rf, DCache& _D$): rf(_rf), D$(_D$){}
+    WBModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$) {}
     //ICache &I$;
-    void execute(/* args */){}
+    void execute(/* args */) {}
 };
 
 class ControlUnit
@@ -250,7 +256,7 @@ public:
     //more data
 
     //methods
-    Processor(): IF(pc, I$) , IDRF(rf, D$), EX(alu), MEM(D$), WB(rf, D$) {}
+    Processor() : IF(pc, I$), IDRF(rf, D$), EX(alu), MEM(D$), WB(rf, D$) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();
