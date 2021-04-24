@@ -12,15 +12,23 @@
 #include <iostream>
 using namespace std;
 
-void EMBuffer::set(int target, int value) {
+void EMBuffer::set(int target, int value)
+{
     memTarget = target;
     val = value;
 }
 
-int EMBuffer::getTarget() {
+int EMBuffer::getTarget()
+{
     return memTarget;
 }
 
-int EMBuffer::getValue() {
+int EMBuffer::getValue()
+{
     return val;
+}
+
+EMBuffer::EMBuffer()
+{
+    invalid = true;
 }

@@ -12,15 +12,23 @@
 #include <iostream>
 using namespace std;
 
-void IFIDBuffer::set(int npc, int instruction) {
+void IFIDBuffer::set(int npc, int instruction)
+{
     npcVal = npc;
     this->instruction = instruction;
 }
 
-int IFIDBuffer::getNPC() {
+int IFIDBuffer::getNPC()
+{
     return npcVal;
 }
 
-int IFIDBuffer::getInstruction() {
+int IFIDBuffer::getInstruction()
+{
     return instruction;
+}
+
+IFIDBuffer::IFIDBuffer()
+{
+    invalid = true;
 }

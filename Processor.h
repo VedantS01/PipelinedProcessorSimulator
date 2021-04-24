@@ -54,6 +54,7 @@ class RegisterFile
 {
 public:
     bool request_failed;
+    bool isWriting[16];
     Register R[NUM_REGS];
     flag fread1;
     flag fread2;
@@ -109,7 +110,11 @@ class IFModule
 {
 public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
-    IFModule(PC &_pc, ICache &_I$) : pc(_pc), I$(_I$) {}
+    bool *stall;
+    IFModule(PC &_pc, ICache &_I$, bool _stall[5]) : pc(_pc), I$(_I$)
+    {
+        stall = _stall;
+    }
     IFIDBuffer execute(/* args */);
     ICache &I$;
     PC npc;
@@ -158,7 +163,10 @@ public:
 class IDRFModule
 {
 public:
-    IDRFModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$) {}
+    IDRFModule(RegisterFile &_rf, DCache &_D$, bool _stall[5]) : rf(_rf), D$(_D$), stall(_stall)
+    {
+    }
+    bool *stall;
     RegisterFile &rf;
     DCache &D$;
     IFIDBuffer ifidBuf;
@@ -192,7 +200,10 @@ class EXModule
 {
 public:
     ALU &alu;
-    EXModule(ALU &_alu) : alu(_alu) {}
+    bool *stall;
+    EXModule(ALU &_alu, bool _stall[5]) : alu(_alu), stall(_stall)
+    {
+    }
     IDEXBuffer idexBuf;
     EMBuffer execute(/* args */) {}
 };
@@ -211,7 +222,11 @@ public:
 class MEMModule
 {
 public:
-    MEMModule(DCache &_D$) : D$(_D$) {}
+    MEMModule(DCache &_D$, bool _stall[5]) : D$(_D$), stall(_stall)
+    {
+        }
+    bool *stall;
+
     DCache &D$;
     EMBuffer emBuf;
     Register LMD;
@@ -224,7 +239,12 @@ public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
-    WBModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$) {}
+    WBModule(RegisterFile &_rf, DCache &_D$, bool _stall[5]) : rf(_rf), D$(_D$)
+    {
+        stall = _stall;
+    }
+    bool *stall;
+
     //ICache &I$;
     void execute(/* args */) {}
 };
@@ -257,12 +277,14 @@ public:
     flag HALT_SIGNAL;
     flag COMPLETE;
     int clock_cycle;
+
+    bool stall[5];
     //more
 
     //more data
 
     //methods
-    Processor() : IF(pc, I$), IDRF(rf, D$), EX(alu), MEM(D$), WB(rf, D$) {}
+    Processor() : IF(pc, I$, stall), IDRF(rf, D$, stall), EX(alu, stall), MEM(D$, stall), WB(rf, D$, stall) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();

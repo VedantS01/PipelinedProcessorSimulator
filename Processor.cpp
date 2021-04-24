@@ -14,9 +14,11 @@
 #include <iostream>
 using namespace std;
 
-void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
+void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
+{
     //read icache values
-    for(int i = 0; i < NUMSETS; i++) {
+    for (int i = 0; i < NUMSETS; i++)
+    {
         finI >> hex >> I$.data[i].offset[0];
         finI >> hex >> I$.data[i].offset[1];
         finI >> hex >> I$.data[i].offset[2];
@@ -36,7 +38,8 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
     */
 
     //read dcache values
-    for(int i = 0; i < NUMSETS; i++) {
+    for (int i = 0; i < NUMSETS; i++)
+    {
         finD >> hex >> D$.data[i].offset[0];
         finD >> hex >> D$.data[i].offset[1];
         finD >> hex >> D$.data[i].offset[2];
@@ -56,7 +59,8 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
 
     //read register file values
     int v;
-    for(int i = 1; i < 16; i++) {
+    for (int i = 1; i < 16; i++)
+    {
         finR >> hex >> v;
         //rf.write(i,v);
         rf.R[i].val = v;
@@ -82,50 +86,74 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR) {
     //WB.I$ = I$;
     WB.rf = rf;
     */
-    
 }
 
-void Processor::startup() {
+void Processor::startup()
+{
+    for (int i = 0; i < 5; i++)
+    {
+        stall[i] = false;
+    }
     pc.val = 0;
     HALT_SIGNAL = false;
     COMPLETE = false;
     clock_cycle = 0;
-    while (!COMPLETE) {
+    while (!COMPLETE)
+    {
         cycle();
     }
-    
 }
 
-void Processor::cycle() {
-    //processor clock cycle
-    /*
+void Processor::cycle()
+{
+    // processor clock cycle
+
     clock_cycle++;
-    int stages_active = 0;
-    if(!HALT_SIGNAL) {
+    // int stages_active = 0;
+    if (!stall[0])
+    {
         IFID = IF.execute();
-        stages_active++;
-    } else {
-        IFID.invalid = true;
+        // stages_active++;
     }
-    IDEX = IDRF.execute();
+    if (!stall[1])
+    {
+        IDEX = IDRF.execute();
+    }
+
     HALT_SIGNAL = IDEX.HALT_SIGNAL;
-    EM = EX.execute();
-    MW = MEM.execute();
-    WB.execute();
 
+    if (!stall[2])
+    {
+        EM = EX.execute();
+    }
+    if (!stall[3])
+    {
+        MW = MEM.execute();
+    }
+    if (!stall[4])
+    {
+        WB.execute();
+    }
 
-    if(clock_cycle == 10) {
+    IDRF.ifidBuf = IFID;
+    EX.idexBuf = IDEX;
+    MEM.emBuf = EM;
+    WB.mwBuf = MW;
+
+    if (clock_cycle == 10)
+    {
         HALT_SIGNAL = true;
         COMPLETE = true;
     }
-    pc.increment(); 
-    */
+    pc.increment();
 }
 
-void Processor::testicache() {
+void Processor::testicache()
+{
     ofstream fout;
     fout.open("debugif.txt");
-    for(int i = 0; i < NUMSETS; i++) {
+    for (int i = 0; i < NUMSETS; i++)
+    {
         fout << hex << I$.data[i].offset[0] << endl;
         fout << hex << I$.data[i].offset[1] << endl;
         fout << hex << I$.data[i].offset[2] << endl;

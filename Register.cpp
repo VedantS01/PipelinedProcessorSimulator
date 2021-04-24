@@ -65,6 +65,10 @@ void RegisterFile::write(int rPos, int _val)
 
 RegisterFile::RegisterFile()
 {
+    for (int i = 0; i < 16; i++)
+    {
+        isWriting[i] = false;
+    }
     request_failed = false;
     fread1 = fread2 = fwrite = false;
     busy = false;
