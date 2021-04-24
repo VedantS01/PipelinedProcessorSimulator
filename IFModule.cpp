@@ -17,9 +17,10 @@ IFIDBuffer IFModule::execute() {
     //int v = pc.val;
     //cout << "in if module, addr is " << pc.val << endl; 
     int instruction = I$.request(v);
-    npc.write(v);
-    npc.increment();
+    //npc.write(v);
+    //npc.increment();
+    pc.increment();
     IFIDBuffer buf;
-    buf.set(npc.val, instruction);
+    buf.set(pc.val, instruction);
     return buf;
 }

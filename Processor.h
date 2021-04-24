@@ -170,6 +170,9 @@ public:
 class EMBuffer
 {
     public:
+    flag invalid;
+    flag HALT_SIGNAL;
+
     int aluOutput;
     flag load;
     flag store;
@@ -180,6 +183,7 @@ class EMBuffer
     void set(int,int);
     int getTarget();
     int getValue();
+    
 };
 
 class ALU
@@ -227,12 +231,13 @@ class ControlUnit
 class Processor
 {
 public:
-    ControlUnit CU;
+    //ControlUnit CU;
     ICache I$;
     DCache D$;
     RegisterFile rf;
     PC pc;
     Register16 IR;
+
     IFModule IF;
     IFIDBuffer IFID;
     IDRFModule IDRF;
@@ -242,10 +247,13 @@ public:
     MEMModule MEM;
     MWBuffer MW;
     WBModule WB;
+
     ALU alu;
     flag HALT_SIGNAL;
     flag COMPLETE;
     int clock_cycle;
+    //more
+
 
     //more data
 

@@ -98,6 +98,7 @@ void Processor::startup() {
 
 void Processor::cycle() {
     //processor clock cycle
+    /*
     clock_cycle++;
     int stages_active = 0;
     if(!HALT_SIGNAL) {
@@ -118,6 +119,7 @@ void Processor::cycle() {
         COMPLETE = true;
     }
     pc.increment(); 
+    */
 }
 
 void Processor::testicache() {
