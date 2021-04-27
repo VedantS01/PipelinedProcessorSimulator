@@ -23,10 +23,13 @@ WBSTATUS WBModule::execute()
     if (mwBuf.aluInstr)
     {
         rf.write(mwBuf.dest, mwBuf.val);
+        rf.isWriting[mwBuf.dest] = false;
     }
     else if (mwBuf.load)
     {
         rf.write(mwBuf.dest, mwBuf.lmd);
+        rf.isWriting[mwBuf.dest] = false;
+        cout << "Written: " << mwBuf.lmd << " on register " << mwBuf.dest << endl;
     }
     status.invalid = false;
     status.ready = true;

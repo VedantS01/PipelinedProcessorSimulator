@@ -20,6 +20,12 @@ EMBuffer EXModule::execute()
     if(idexBuf.invalid) {
         return buf;
     }
+    
+    cout << "idex operand1:" << idexBuf.dest << endl;
+    cout << "idex oprand2:" << idexBuf.src1 << endl;
+    cout << "idex opear3:" << idexBuf.offset << endl;
+    if(idexBuf.arithmetic || idexBuf.logical)
+    cout << "idex arith" << endl;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
@@ -114,20 +120,28 @@ EMBuffer EXModule::execute()
     else if(idexBuf.load)
         {
             buf.writeToRegister = false;
+            buf.load = true;
             //calc effective address
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.offset;
             int val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
+            buf.dest = idexBuf.dest;
+            buf.validdest = idexBuf.validdest;
+            cout << "Actual :" << val << endl;
         }
     else if(idexBuf.store)
         {
             buf.writeToRegister = false;
+            buf.load = false;
             //calc effective address
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.offset;
             int val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
+            buf.dest = idexBuf.dest;
+            buf.destval = idexBuf.destval;
+            buf.validdest = idexBuf.validdest;
         }
     else if(idexBuf.jump)
         {
@@ -161,5 +175,6 @@ EMBuffer EXModule::execute()
         }
     buf.invalid = false;
     buf.ready = true;
+    cout << "aluout: " << buf.aluOutput << endl; 
     return buf;
 }

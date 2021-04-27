@@ -101,10 +101,23 @@ void Processor::startup()
     IF.go = true;
     wbstatus.invalid = true;
     wbstatus.ready = true;
-    while (!COMPLETE)
-    {
-        cycle();
-    }
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
+    cycle();
 }
 
 void Processor::cycle()
@@ -202,7 +215,7 @@ void Processor::cycle()
         HALT_SIGNAL = true;
         COMPLETE = true;
     }
-    pc.increment();
+    //pc.increment();
 }
 
 void Processor::testicache()

@@ -13,12 +13,14 @@
 using namespace std;
 
 int ALU::adder(int a, int b, bool as) {
+    cout << "a = " << a << " b = " << b << " : " ;
     int r;
     if(as) {
         r = a - b;
     } else {
         r = a + b;
     }
+    cout << (r & 0xff) << endl;
     return r & 0xff;
 }
 int ALU::mul(int a, int b) {

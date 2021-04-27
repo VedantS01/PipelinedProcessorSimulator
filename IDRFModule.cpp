@@ -35,7 +35,12 @@ IDEXBuffer IDRFModule::execute()
     int subop = opcode & 3;
     if (mode == 0)
     {
-        buf.arithmetic = 1;
+        buf.arithmetic = true;
+        buf.logical = false;
+        buf.load = false;
+        buf.jump = false;
+        buf.bneq = false;
+        buf.store = false;
         buf.subop = subop;
         rf.getBusy();
         rf.reset();
@@ -83,7 +88,12 @@ IDEXBuffer IDRFModule::execute()
     }
     else if (mode == 1)
     {
-        buf.logical = 1;
+        buf.logical = true;
+        buf.arithmetic = false;
+        buf.load = false;
+        buf.jump = false;
+        buf.bneq = false;
+        buf.store = false;
         buf.subop = subop;
         rf.getBusy();
         rf.reset();
@@ -133,7 +143,13 @@ IDEXBuffer IDRFModule::execute()
     {
         if (subop == 0)
         {
+            cout << "Here!" << endl;
+            buf.logical = false;
+            buf.arithmetic = false;
             buf.load = true;
+            buf.jump = false;
+            buf.bneq = false;
+            buf.store = false;
             rf.getBusy();
             rf.reset();
             int destA = (instruction >> 8) & 0xf;
@@ -141,6 +157,7 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A])
             {
+                cout << "Illegal" << endl;
                 stall[0] = true;
 
                 stall[1] = true;
@@ -168,6 +185,11 @@ IDEXBuffer IDRFModule::execute()
         else if (subop == 1)
         {
             buf.store = true;
+            buf.logical = false;
+            buf.arithmetic = false;
+            buf.load = false;
+            buf.jump = false;
+            buf.bneq = false;
             rf.getBusy();
             rf.reset();
             int destA = (instruction >> 8) & 0xf;
@@ -202,7 +224,12 @@ IDEXBuffer IDRFModule::execute()
         else if (subop == 2)
         {
             buf.jump_addr = (instruction >> 4) & 0xff;
+            buf.store = false;
+            buf.logical = false;
+            buf.arithmetic = false;
+            buf.load = false;
             buf.jump = true;
+            buf.bneq = false;
             stall[0] = true;
             stall[1] = true;
             //branch issues;
@@ -210,6 +237,11 @@ IDEXBuffer IDRFModule::execute()
         else
         {
             buf.jump_addr = instruction & 0xff;
+            buf.store = false;
+            buf.logical = false;
+            buf.arithmetic = false;
+            buf.load = false;
+            buf.jump = false;
             buf.bneq = true;
             int destA = (instruction >> 8) & 0xf;
             rf.getBusy();
@@ -230,6 +262,10 @@ IDEXBuffer IDRFModule::execute()
     }
     buf.invalid = false;
     buf.ready = true;
+    cout << "Opcode: " << opcode << endl;
+    cout << "operand1:" << buf.dest << endl;
+    cout << "oprand2:" << buf.src1 << endl;
+    cout << "opear3:" << buf.offset << endl;
     return buf;
 }
 

@@ -15,7 +15,9 @@ using namespace std;
 MWBuffer MEMModule::execute()
 {
     MWBuffer buf;
+    cout << "mem " << emBuf.aluOutput << endl;
     if(emBuf.invalid) {
+        cout << "invalid mem:" << endl;
         buf.invalid = true;
         buf.ready = true;
         return buf;
@@ -29,6 +31,7 @@ MWBuffer MEMModule::execute()
         LMD.write(d);
         buf.lmd = d;
         buf.dest = emBuf.dest;
+        cout << "Loaded data " << d << " in register " << buf.dest << endl;
     }
     else if (emBuf.store)
     {
