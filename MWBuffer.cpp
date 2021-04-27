@@ -15,4 +15,5 @@ using namespace std;
 MWBuffer::MWBuffer()
 {
     invalid = true;
+    ready = true;
 }

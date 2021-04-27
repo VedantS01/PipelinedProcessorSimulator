@@ -31,4 +31,5 @@ int IFIDBuffer::getInstruction()
 IFIDBuffer::IFIDBuffer()
 {
     invalid = true;
+    ready = true;
 }

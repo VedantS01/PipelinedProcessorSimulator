@@ -41,13 +41,14 @@ int RegisterFile::read(int rPos)
     else if (fread1 == false)
     {
         fread1 = true;
-        R[rPos].read();
+        return R[rPos].read();
     }
     else if (fread2 == false)
     {
         fread2 = true;
-        R[rPos].read();
+        return R[rPos].read();
     }
+    return 0;
 }
 
 void RegisterFile::write(int rPos, int _val)

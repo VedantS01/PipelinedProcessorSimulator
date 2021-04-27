@@ -15,6 +15,11 @@ using namespace std;
 MWBuffer MEMModule::execute()
 {
     MWBuffer buf;
+    if(emBuf.invalid) {
+        buf.invalid = true;
+        buf.ready = true;
+        return buf;
+    }
     if (emBuf.load)
     {
         buf.load = true;
@@ -39,5 +44,7 @@ MWBuffer MEMModule::execute()
         buf.dest = emBuf.dest;
         buf.val = emBuf.aluOutput;
     }
+    buf.invalid = false;
+    buf.ready = true;
     return buf;
 }

@@ -59,7 +59,7 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
 
     //read register file values
     int v;
-    for (int i = 1; i < 16; i++)
+    for (int i = 0; i < 16; i++)
     {
         finR >> hex >> v;
         //rf.write(i,v);
@@ -98,6 +98,9 @@ void Processor::startup()
     HALT_SIGNAL = false;
     COMPLETE = false;
     clock_cycle = 0;
+    IF.go = true;
+    wbstatus.invalid = true;
+    wbstatus.ready = true;
     while (!COMPLETE)
     {
         cycle();
@@ -142,17 +145,57 @@ void Processor::cycle()
     WB.mwBuf = MW;
 
     */
-
-    if(!HALT_SIGNAL) {
+    //cout << "1:\n";
+    if(IF.go) {
         IFID = IF.execute();
     }
-    IDEX = IDRF.execute();
-    //EM = EX.execute();
-    MW = MEM.execute();
-    WB.execute();
+    if(!IDRF.ifidBuf.invalid)
+        //cout << "3:\n";
+        IDEX = IDRF.execute();
+    if(!EX.idexBuf.invalid)
+        EM = EX.execute();
+    if(!MEM.emBuf.invalid)
+        MW = MEM.execute();
+    if(!WB.mwBuf.invalid)
+        wbstatus = WB.execute();
 
     //forward
-    //tobe done
+    if(wbstatus.ready) {
+        WB.mwBuf = MW;
+        if(MW.ready) {
+            MEM.emBuf = EM;
+            if(EM.ready) {
+                EX.idexBuf = IDEX;
+                if(IDEX.ready) {
+                    IDRF.ifidBuf = IFID;
+                    if(IFID.ready) {
+                        //cout << "2:\n";
+                        IF.go = true;
+                    } else {
+                        IF.go = false;
+                    }
+                } else {
+                    IF.go = false;
+                    IDRF.ifidBuf.invalid = true;
+                }
+            } else {
+                IF.go = false;
+                IDRF.ifidBuf.invalid = true;
+                EX.idexBuf.invalid = true;
+            }
+        } else {
+            IF.go = false;
+            IDRF.ifidBuf.invalid = true;
+            EX.idexBuf.invalid = true;
+            IDRF.ifidBuf.invalid = true;
+        }
+    } else {
+        IF.go = false;
+        IDRF.ifidBuf.invalid = true;
+        EX.idexBuf.invalid = true;
+        IDRF.ifidBuf.invalid = true;
+        WB.mwBuf.invalid = true;
+    }
 
     if (clock_cycle == 10)
     {

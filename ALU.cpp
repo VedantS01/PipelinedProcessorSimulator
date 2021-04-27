@@ -25,16 +25,16 @@ int ALU::mul(int a, int b) {
     int r = a * b;
     return r & 0xff;
 }
-int ALU::and(int a, int b) {
+int ALU::AND(int a, int b) {
     return a & b;
 }
-int ALU::or(int a, int b) {
+int ALU::OR(int a, int b) {
     return a | b;
 }
-int ALU::not(int a) {
+int ALU::NOT(int a) {
     return ~a;
 }
-int ALU::xor(int a, int b) {
+int ALU::XOR(int a, int b) {
     return a ^ b;
 }
 /*
@@ -55,19 +55,19 @@ struct EXBuffer inc(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, idexbuf.destval+1};
 }
-struct EXBuffer bitand(IDEXBuffer idexbuf)
+struct EXBuffer and(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, idexbuf.srcval1 & idexbuf.srcval2};
 }
-struct EXBuffer bitor(IDEXBuffer idexbuf)
+struct EXBuffer or(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, idexbuf.srcval1 | idexbuf.srcval2};
 }
-struct EXBuffer bitnot(IDEXBuffer idexbuf)
+struct EXBuffer not(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, ~idexbuf.destval};
 }
-struct EXBuffer bitxor(IDEXBuffer idexbuf)
+struct EXBuffer xor(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, idexbuf.srcval1 ^ idexbuf.srcval2};
 }

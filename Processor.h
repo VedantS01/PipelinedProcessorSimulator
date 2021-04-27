@@ -30,7 +30,7 @@ class Register
 public:
     int val;
     int read();
-    void write(int _val); //_val is well inside 8 bits
+    void write(int _val); //_val is well inside 8 s
 };
 
 class Register16
@@ -38,7 +38,7 @@ class Register16
 public:
     int val;
     int read();
-    void write(int _val); //_val is well inside 8 bits
+    void write(int _val); //_val is well inside 8 s
 };
 
 class PC
@@ -101,9 +101,11 @@ public:
     int npcVal;
     int instruction;
     flag invalid;
+    flag ready;
     void set(int, int);
     int getNPC();
     int getInstruction();
+    IFIDBuffer();
 };
 
 class IFModule
@@ -118,12 +120,16 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
     IFIDBuffer execute(/* args */);
     ICache &I$;
     PC npc;
+
+    //a go signal to this module
+    flag go;
 };
 
 class IDEXBuffer
 {
 public:
     flag invalid;
+    flag ready;
     flag arithmetic;
     flag logical;
     flag load;
@@ -154,11 +160,13 @@ public:
     int destval;
     int validdest; //will be used in operator forwarding
 
-    //in load store, offset stores the immediate 4 bit value of address offset
+    //in load store, offset stores the immediate 4  value of address offset
     int offset;
 
     //stores jump offset in jump instructions
     int jump_addr;
+
+    IDEXBuffer();
 };
 
 class IDRFModule
@@ -171,22 +179,24 @@ public:
     RegisterFile &rf;
     DCache &D$;
     IFIDBuffer ifidBuf;
-    IDEXBuffer execute(/* args */) {}
+    IDEXBuffer execute(/* args */);
     bool resolveBranch(int);
 };
 
+/*
 class EXModule
 {
 public:
     IDEXBuffer idexbuf;
     EMBuffer execute(IDEXBuffer);
     
-};
+};*/
 
 class EMBuffer
 {
 public:
     flag invalid;
+    flag ready;
     flag HALT_SIGNAL;
 
     int aluOutput;
@@ -199,6 +209,8 @@ public:
     //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
     int destval;
     int validdest; //will be used in operator forwarding
+
+    EMBuffer();
 };
 
 class ALU
@@ -206,10 +218,10 @@ class ALU
     public:
     int adder(int , int, bool);
     int mul(int, int);
-    int and(int, int);
-    int or(int, int);
-    int not(int);
-    int xor(int, int);
+    int AND(int, int);
+    int OR(int, int);
+    int NOT(int);
+    int XOR(int, int);
 };
 
 class EXModule
@@ -223,7 +235,7 @@ public:
     }
     IDEXBuffer idexBuf;
     Register inc;
-    EMBuffer execute(/* args */) {}
+    EMBuffer execute();
 };
 
 class MWBuffer
@@ -234,7 +246,9 @@ public:
     int dest;
     int val;
     int lmd;
-    bool invalid;
+    flag invalid;
+    flag ready;
+    MWBuffer();
 };
 
 class MEMModule
@@ -248,7 +262,17 @@ public:
     DCache &D$;
     EMBuffer emBuf;
     Register LMD;
-    MWBuffer execute(/* args */) {}
+    MWBuffer execute(/* args */);
+};
+
+class WBSTATUS {
+    public:
+    flag invalid;
+    flag ready;
+    WBSTATUS() {
+        invalid = true;
+        ready = true;
+    }
 };
 
 class WBModule
@@ -264,7 +288,7 @@ public:
     bool *stall;
 
     //ICache &I$;
-    void execute(/* args */) {}
+    WBSTATUS execute(/* args */);
 };
 
 class ControlUnit
@@ -290,6 +314,8 @@ public:
     MEMModule MEM;
     MWBuffer MW;
     WBModule WB;
+
+    WBSTATUS wbstatus;
 
     ALU alu;
     flag HALT_SIGNAL;

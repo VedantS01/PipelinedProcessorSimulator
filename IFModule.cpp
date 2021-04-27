@@ -13,6 +13,11 @@
 using namespace std;
 
 IFIDBuffer IFModule::execute() {
+    IFIDBuffer buf;
+    if(!go) {
+        return buf;
+    }
+
     int v = pc.read();
     //int v = pc.val;
     //cout << "in if module, addr is " << pc.val << endl; 
@@ -20,7 +25,8 @@ IFIDBuffer IFModule::execute() {
     //npc.write(v);
     //npc.increment();
     pc.increment();
-    IFIDBuffer buf;
     buf.set(pc.val, instruction);
+    buf.invalid = false;
+    buf.ready = true;
     return buf;
 }

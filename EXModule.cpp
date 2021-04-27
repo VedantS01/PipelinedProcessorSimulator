@@ -16,6 +16,7 @@ EMBuffer EXModule::execute()
 {
     EMBuffer buf;
     buf.invalid = true;
+    buf.ready = true;
     if(idexBuf.invalid) {
         return buf;
     }
@@ -75,7 +76,7 @@ EMBuffer EXModule::execute()
             //xor
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
-            int val = alu.xor(val1, val2);
+            int val = alu.XOR(val1, val2);
             buf.aluOutput = val;
             buf.destval = val;
             buf.validdest = true;
@@ -84,7 +85,7 @@ EMBuffer EXModule::execute()
         {
             //not
             int val1 = idexBuf.srcval1;
-            int val = alu.not(val1);
+            int val = alu.NOT(val1);
             buf.aluOutput = val;
             buf.destval = val;
             buf.validdest = true;
@@ -94,7 +95,7 @@ EMBuffer EXModule::execute()
             //or
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
-            int val = alu.or(val1, val2);
+            int val = alu.OR(val1, val2);
             buf.aluOutput = val;
             buf.destval = val;
             buf.validdest = true;
@@ -104,7 +105,7 @@ EMBuffer EXModule::execute()
             //and
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
-            int val = alu.and(val1, val2);
+            int val = alu.AND(val1, val2);
             buf.aluOutput = val;
             buf.destval = val;
             buf.validdest = true;
@@ -158,5 +159,7 @@ EMBuffer EXModule::execute()
             //keep same pc value;
 
         }
+    buf.invalid = false;
+    buf.ready = true;
     return buf;
 }

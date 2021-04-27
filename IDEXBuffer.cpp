@@ -15,4 +15,5 @@ using namespace std;
 IDEXBuffer::IDEXBuffer()
 {
     invalid = true;
+    ready = true;
 }

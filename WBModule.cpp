@@ -12,8 +12,14 @@
 #include <iostream>
 using namespace std;
 
-void WBModule::execute()
+WBSTATUS WBModule::execute()
 {
+    WBSTATUS status;
+    if(mwBuf.invalid) {
+        status.invalid = true;
+        status.ready = true;
+        return status;
+    }
     if (mwBuf.aluInstr)
     {
         rf.write(mwBuf.dest, mwBuf.val);
@@ -22,4 +28,7 @@ void WBModule::execute()
     {
         rf.write(mwBuf.dest, mwBuf.lmd);
     }
+    status.invalid = false;
+    status.ready = true;
+    return status;
 }

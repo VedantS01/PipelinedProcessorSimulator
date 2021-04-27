@@ -12,6 +12,12 @@
 #include <iostream>
 using namespace std;
 
+
+int signExtend(int x, int s)
+{
+    return ((s << 7) | (s << 6) | (s << 5) | (s << 4) | x);
+}
+
 IDEXBuffer IDRFModule::execute()
 {
     //decode here
@@ -19,9 +25,11 @@ IDEXBuffer IDRFModule::execute()
     if (ifidBuf.invalid)
     {
         buf.invalid = true;
+        buf.ready = true;
         return buf;
     }
     int instruction = ifidBuf.getInstruction();
+    cout << "Instruction: " << instruction << endl;
     int opcode = instruction >> 12;
     int mode = opcode >> 2;
     int subop = opcode & 3;
@@ -40,6 +48,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             buf.validsrc1 = false;
@@ -55,6 +64,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -86,6 +96,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -102,6 +113,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -133,6 +145,7 @@ IDEXBuffer IDRFModule::execute()
 
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             //base register
@@ -166,6 +179,7 @@ IDEXBuffer IDRFModule::execute()
 
                 stall[1] = true;
                 buf.invalid = true;
+                buf.ready = false;
                 return buf;
             }
             //base register
@@ -215,12 +229,8 @@ IDEXBuffer IDRFModule::execute()
         buf.HALT_SIGNAL = true;
     }
     buf.invalid = false;
+    buf.ready = true;
     return buf;
-}
-
-int signExtend(int x, int s)
-{
-    return ((s << 7) | (s << 6) | (s << 5) | (s << 4) | x);
 }
 
 bool IDRFModule::resolveBranch(int reg)
