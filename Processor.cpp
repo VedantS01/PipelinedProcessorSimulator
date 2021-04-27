@@ -110,6 +110,7 @@ void Processor::cycle()
 
     clock_cycle++;
     // int stages_active = 0;
+    /* WILL WORK ON THIS ONE
     if (!stall[0])
     {
         IFID = IF.execute();
@@ -139,6 +140,19 @@ void Processor::cycle()
     EX.idexBuf = IDEX;
     MEM.emBuf = EM;
     WB.mwBuf = MW;
+
+    */
+
+    if(!HALT_SIGNAL) {
+        IFID = IF.execute();
+    }
+    IDEX = IDRF.execute();
+    //EM = EX.execute();
+    MW = MEM.execute();
+    WB.execute();
+
+    //forward
+    //tobe done
 
     if (clock_cycle == 10)
     {

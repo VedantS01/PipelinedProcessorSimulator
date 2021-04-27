@@ -12,70 +12,151 @@
 #include <iostream>
 using namespace std;
 
-struct EXBuffer EXModule::execute(IDEXBuffer idexbuf)
+EMBuffer EXModule::execute()
 {
-    if(idexbuf.arithmetic)   //mode=0
-    {
-          if( (subop>>1) & (subop&1) ) //subop=3
-          {
-              return inc(idexbuf);
-          }
-          else if( (subop>>1) & (!(subop&1)) ) //subop=2
-          {
-              return mul(idexbuf);
-          }
-          else if( (!(subop>>1)) & (subop&1)) //subop=1
-          {
-              return sub(idexbuf);
-          }
-          else //subop=0
-          {
-              return add(idexbuf);
-          }
+    EMBuffer buf;
+    buf.invalid = true;
+    if(idexBuf.invalid) {
+        return buf;
     }
-    else if(idexbuf.logical)   //mode=1
+    int subop = idexBuf.subop;
+    if(idexBuf.arithmetic)   //mode=0
     {
-        if( (subop>>1) & (subop&1) ) //subop=3
+        buf.writeToRegister = true;
+        if( (subop >> 1) & (subop & 1) ) //subop=3
         {
-            return bitxor(idexbuf);
+            //incrementer
+            int val1 = idexBuf.srcval1;
+            int val2 = inc.read();
+            val1 = alu.adder(val1, val2, 0);
+            buf.aluOutput = val1;
+            buf.destval = val1;
+            buf.validdest = true;
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
-            return bitnot(idexbuf);
+            //multiplier
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            //TODO: sign extend and etc in case result is not coming right
+            int val = alu.mul(val1, val2);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
-            return bitor(idexbuf);
+            //subtract
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            //TODO: sign extend and etc in case result is not coming right
+            int val = alu.adder(val1, val2, 1);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
         else //subop=0
         {
-            return bitand(idexbuf);
+            //add
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            //TODO: sign extend and etc in case result is not coming right
+            int val = alu.adder(val1, val2, 0);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
     }
-    else if( (mode>>1) & (!(mode&1)) )  //mode=2
+    else if(idexBuf.logical)   //mode=1
     {
-        if(idexbuf.load)
+        buf.writeToRegister = true;
+        if( (subop >> 1) & (subop & 1) ) //subop=3
         {
-            return load(idexbuf);
+            //xor
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            int val = alu.xor(val1, val2);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
-        else if(idexbuf.store)
+        else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
-            return store(idexbuf);
+            //not
+            int val1 = idexBuf.srcval1;
+            int val = alu.not(val1);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
-        else if(idexbuf.jump)
+        else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
-            return jump(idexbuf);
+            //or
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            int val = alu.or(val1, val2);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
-        else
+        else //subop=0
         {
-            return beqz(idexbuf);
+            //and
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.srcval2;
+            int val = alu.and(val1, val2);
+            buf.aluOutput = val;
+            buf.destval = val;
+            buf.validdest = true;
         }
     }
-    else
-    {
-        if(idexbuf.HALT_SIGNAL)
+    else if(idexBuf.load)
         {
-            return HALT(idexbuf);
+            buf.writeToRegister = false;
+            //calc effective address
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.offset;
+            int val = alu.adder(val1, val2, 0);
+            buf.aluOutput = val;
         }
-    }
+    else if(idexBuf.store)
+        {
+            buf.writeToRegister = false;
+            //calc effective address
+            int val1 = idexBuf.srcval1;
+            int val2 = idexBuf.offset;
+            int val = alu.adder(val1, val2, 0);
+            buf.aluOutput = val;
+        }
+    else if(idexBuf.jump)
+        {
+            buf.writeToRegister = false;
+            //calc effective address
+            int val1 = idexBuf.npc;
+            int val2 = idexBuf.jump_addr;
+            int val = alu.adder(val1, val2, 0);
+            buf.aluOutput = val;
+
+            //set pc new value
+        }
+    else if(idexBuf.bneq)
+        {
+            buf.writeToRegister = false;
+            //compare with 0
+            int val1 = idexBuf.destval;
+            int val2 = 0;
+            if(val1 ^ val2) {
+                //calc effective address
+                int val1 = idexBuf.npc;
+                int val2 = idexBuf.jump_addr;
+                int val = alu.adder(val1, val2, 0);
+                buf.aluOutput = val;
+                
+                //set pc new value
+            }
+
+            //keep same pc value;
+
+        }
+    return buf;
 }

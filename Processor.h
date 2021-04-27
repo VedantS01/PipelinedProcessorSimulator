@@ -129,6 +129,7 @@ public:
     flag load;
     flag store;
     flag jump;
+    flag bneq;
     flag HALT_SIGNAL;
     int subop;
 
@@ -178,10 +179,10 @@ class EXModule
 {
 public:
     IDEXBuffer idexbuf;
-    EXBuffer execute(IDEXBuffer);
+    EMBuffer execute(IDEXBuffer);
     
 };
-/*
+
 class EMBuffer
 {
 public:
@@ -192,16 +193,23 @@ public:
     flag load;
     flag store;
     flag writeToRegister;
+
+    //will denote write_to register in arithmetic and logic operations and load instruction
     int dest;
-    int memTarget;
-    int val;
-    void set(int, int);
-    int getTarget();
-    int getValue();
+    //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
+    int destval;
+    int validdest; //will be used in operator forwarding
 };
 
 class ALU
 {
+    public:
+    int adder(int , int, bool);
+    int mul(int, int);
+    int and(int, int);
+    int or(int, int);
+    int not(int);
+    int xor(int, int);
 };
 
 class EXModule
@@ -211,11 +219,12 @@ public:
     bool *stall;
     EXModule(ALU &_alu, bool _stall[5]) : alu(_alu), stall(_stall)
     {
+        inc.write(1);
     }
     IDEXBuffer idexBuf;
+    Register inc;
     EMBuffer execute(/* args */) {}
 };
-*/
 
 class MWBuffer
 {

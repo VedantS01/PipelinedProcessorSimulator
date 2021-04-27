@@ -12,6 +12,33 @@
 #include <iostream>
 using namespace std;
 
+int ALU::adder(int a, int b, bool as) {
+    int r;
+    if(as) {
+        r = a - b;
+    } else {
+        r = a + b;
+    }
+    return r & 0xff;
+}
+int ALU::mul(int a, int b) {
+    int r = a * b;
+    return r & 0xff;
+}
+int ALU::and(int a, int b) {
+    return a & b;
+}
+int ALU::or(int a, int b) {
+    return a | b;
+}
+int ALU::not(int a) {
+    return ~a;
+}
+int ALU::xor(int a, int b) {
+    return a ^ b;
+}
+/*
+
 struct EXBuffer add(IDEXBuffer idexbuf)
 {
     return EXBuffer{idexbuf.dest, idexbuf.srcval1 + idexbuf.srcval2};
@@ -69,3 +96,5 @@ struct EXBuffer HALT(IDEXBuffer idexbuf)
     return EXBuffer{1,1};
     //TO BE COMLETED
 }
+
+*/
