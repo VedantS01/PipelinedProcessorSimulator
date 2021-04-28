@@ -155,6 +155,7 @@ EMBuffer EXModule::execute()
                 //calc effective address
                 int val1 = idexBuf.npc;
                 int val2 = idexBuf.jump_addr;
+                val2 = val2 << 1;
                 int val = alu.adder(val1, val2, 0);
                 buf.aluOutput = val;
                 
