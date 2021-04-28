@@ -24,7 +24,8 @@ IDEXBuffer IDRFModule::execute()
     if (ifidBuf.invalid)
     {
         buf.invalid = true;
-        buf.ready = true;
+        //buf.ready = true;
+        ready = true;
         return buf;
     }
     int instruction = ifidBuf.getInstruction();
@@ -53,7 +54,8 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
-                buf.ready = false;
+                //buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.validsrc1 = false;
@@ -72,6 +74,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -110,6 +113,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -129,6 +133,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -168,6 +173,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             //base register
@@ -207,6 +213,7 @@ IDEXBuffer IDRFModule::execute()
                 stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             //base register
@@ -267,10 +274,12 @@ IDEXBuffer IDRFModule::execute()
     }
     buf.invalid = false;
     buf.ready = true;
+    ready = true;
     cout << "Opcode: " << opcode << endl;
     cout << "operand1:" << buf.dest << endl;
     cout << "oprand2:" << buf.src1 << endl;
     cout << "opear3:" << buf.offset << endl;
+    cout << "src2:" << buf.src2 << endl;
     return buf;
 }
 

@@ -15,6 +15,8 @@ using namespace std;
 IFIDBuffer IFModule::execute() {
     IFIDBuffer buf;
     if(!go) {
+        buf.invalid = true;
+        ready = true;
         return buf;
     }
 
@@ -28,5 +30,6 @@ IFIDBuffer IFModule::execute() {
     buf.set(pc.val, instruction);
     buf.invalid = false;
     buf.ready = true;
+    ready = true;
     return buf;
 }

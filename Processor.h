@@ -53,8 +53,8 @@ public:
 class RegisterFile
 {
 public:
-    bool request_failed;
-    bool isWriting[16];
+    flag request_failed;
+    flag isWriting[16];
     Register R[NUM_REGS];
     flag fread1;
     flag fread2;
@@ -98,13 +98,28 @@ public:
 class IFIDBuffer
 {
 public:
+    //current instruction pc value
     int npcVal;
+
+    //instruction fetched
     int instruction;
+
+    //whether the contents of his buffer matter
     flag invalid;
+
+    //redundant
     flag ready;
+
+    //setter; redundant
     void set(int, int);
+
+    //getter; redudant
     int getNPC();
+
+    //getter; redundant
     int getInstruction();
+
+    //constructor
     IFIDBuffer();
 };
 
@@ -112,10 +127,11 @@ class IFModule
 {
 public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
-    bool *stall;
-    IFModule(PC &_pc, ICache &_I$, bool _stall[5]) : pc(_pc), I$(_I$)
+    flag *stall;
+    IFModule(PC &_pc, ICache &_I$, flag _stall[5]) : pc(_pc), I$(_I$)
     {
         stall = _stall;
+        ready = true;
     }
     IFIDBuffer execute(/* args */);
     ICache &I$;
@@ -123,20 +139,40 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
 
     //a go signal to this module
     flag go;
+    flag ready; //reduntant as of yet
 };
 
 class IDEXBuffer
 {
 public:
+    //whether contents matter
     flag invalid;
+
+    //redundant
     flag ready;
+
+    //operation is arithmetic
     flag arithmetic;
+
+    //operation in losgical
     flag logical;
+
+    //operation is load
     flag load;
+
+    //operation is store
     flag store;
+
+    //operation is jump
     flag jump;
+
+    //operation is bneq
     flag bneq;
+
+    //issue halt signal to processor
     flag HALT_SIGNAL;
+
+    //2bit subop for ALU
     int subop;
 
     //npc, denotes the address of the current instrcution
@@ -172,15 +208,19 @@ public:
 class IDRFModule
 {
 public:
-    IDRFModule(RegisterFile &_rf, DCache &_D$, bool _stall[5]) : rf(_rf), D$(_D$), stall(_stall)
+    IDRFModule(RegisterFile &_rf, DCache &_D$, flag _stall[5]) : rf(_rf), D$(_D$), stall(_stall)
     {
+        ready = true;
     }
-    bool *stall;
+    flag *stall;
     RegisterFile &rf;
     DCache &D$;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */);
-    bool resolveBranch(int);
+    flag resolveBranch(int);
+    
+    //status flag
+    flag ready;
 };
 
 /*
@@ -216,7 +256,7 @@ public:
 class ALU
 {
     public:
-    int adder(int , int, bool);
+    int adder(int , int, flag);
     int mul(int, int);
     int AND(int, int);
     int OR(int, int);
@@ -228,22 +268,30 @@ class EXModule
 {
 public:
     ALU &alu;
-    bool *stall;
-    EXModule(ALU &_alu, bool _stall[5]) : alu(_alu), stall(_stall)
+    flag *stall;
+    EXModule(ALU &_alu, flag _stall[5]) : alu(_alu), stall(_stall)
     {
         inc.write(1);
+        ready = true;
     }
     IDEXBuffer idexBuf;
     Register inc;
     EMBuffer execute();
+    
+    //status flag(s)
+    flag ready;
 };
 
 class MWBuffer
 {
 public:
-    bool load;
-    bool aluInstr;
+    flag load;
+    flag aluInstr;
+
     int dest;
+    int destval;
+    flag validdest;
+
     int val;
     int lmd;
     flag invalid;
@@ -254,15 +302,19 @@ public:
 class MEMModule
 {
 public:
-    MEMModule(DCache &_D$, bool _stall[5]) : D$(_D$), stall(_stall)
+    MEMModule(DCache &_D$, flag _stall[5]) : D$(_D$), stall(_stall)
     {
-        }
-    bool *stall;
+        ready = true;
+    }
+    flag *stall;
 
     DCache &D$;
     EMBuffer emBuf;
     Register LMD;
     MWBuffer execute(/* args */);
+
+    //status flag(s)
+    flag ready;
 };
 
 class WBSTATUS {
@@ -281,14 +333,18 @@ public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
-    WBModule(RegisterFile &_rf, DCache &_D$, bool _stall[5]) : rf(_rf), D$(_D$)
+    WBModule(RegisterFile &_rf, DCache &_D$, flag _stall[5]) : rf(_rf), D$(_D$)
     {
         stall = _stall;
+        ready = true;
     }
-    bool *stall;
+    flag *stall;
 
     //ICache &I$;
     WBSTATUS execute(/* args */);
+
+    //status flag(s)
+    flag ready;
 };
 
 class ControlUnit
@@ -322,7 +378,7 @@ public:
     flag COMPLETE;
     int clock_cycle;
 
-    bool stall[5];
+    flag stall[5];
     //more
 
     //more data

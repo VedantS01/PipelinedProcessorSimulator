@@ -32,4 +32,7 @@ IFIDBuffer::IFIDBuffer()
 {
     invalid = true;
     ready = true;
+
+    npcVal = -1;
+    instruction = 0xf000;
 }
