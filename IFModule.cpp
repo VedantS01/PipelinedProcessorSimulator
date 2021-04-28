@@ -20,14 +20,9 @@ IFIDBuffer IFModule::execute() {
         return buf;
     }
     int v = pc.read();
-    //int v = pc.val;
-    //cout << "in if module, addr is " << pc.val << endl; 
     int instruction = I$.request(v);
-    //npc.write(v);
-    //npc.increment();
     pc.increment();
     buf.set(pc.val, instruction);
-    cout << "IF:" << pc.val << endl;
     buf.invalid = false;
     ready = true;
     return buf;

@@ -2,9 +2,8 @@
  *  Processor.cpp   :       Implements the class Processor
  * 
  *  Version         :       1.0
- *  Author          :       Vedant Ashish Saboo
+ *  Author          :       Vedant Ashish Saboo, CS19B074
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 
@@ -86,7 +85,6 @@ void Processor::startup()
     {
         cycle();
     }
-    cout << "Number of clock cycles taken = " << clock_cycle << endl;
 
     output();
     
@@ -95,9 +93,6 @@ void Processor::startup()
 void Processor::cycle()
 {
     // processor clock cycle
-    streambuf *orig_buf = cout.rdbuf();
-
-    // set null
     clock_cycle++;
 
     int flag1 = 0;
@@ -166,13 +161,11 @@ void Processor::cycle()
                     }
                     else
                     {
-                        cout << "Blocking-4" << endl;
                         IF.go = false;
                     }
                 }
                 else
                 {
-                    cout << "Blocking-3" << endl;
                     IF.go = false;
                     IF.stall = true;
                     //IDRF.ifidBuf.ready = false;
@@ -180,7 +173,6 @@ void Processor::cycle()
             }
             else
             {
-                cout << "Blocking-2" << endl;
                 IF.go = false;
                 IF.stall = true;
                 IDRF.stall = true;
@@ -189,7 +181,6 @@ void Processor::cycle()
         }
         else
         {
-            cout << "Blocking-1" << endl;
             IF.go = false;
             IF.stall = true;
             IDRF.stall = true;
@@ -200,7 +191,6 @@ void Processor::cycle()
     }
     else
     {
-        cout << "Blocking" << endl;
         IF.go = false;
         IF.stall = true;
         IDRF.stall = true;
@@ -211,20 +201,6 @@ void Processor::cycle()
         COMPLETE = true; //?
     }
     
-}
-
-void Processor::testicache()
-{
-    ofstream fout;
-    fout.open("debugif.txt");
-    for (int i = 0; i < NUMSETS; i++)
-    {
-        fout << hex << I$.data[i].offset[0] << endl;
-        fout << hex << I$.data[i].offset[1] << endl;
-        fout << hex << I$.data[i].offset[2] << endl;
-        fout << hex << I$.data[i].offset[3] << endl;
-    }
-    fout.close();
 }
 
 void Processor::output() {

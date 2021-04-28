@@ -1,10 +1,9 @@
 /**
- *  IDRFModule.cpp  :       Implements the class IFModule
+ *  IDRFModule.cpp  :       Implements the class IDRFModule
  * 
  *  Version         :       1.0
- *  Author          :       Vedant Saboo
+ *  Author          :       Vedant Saboo, CS19B074
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 
@@ -29,7 +28,6 @@ IDEXBuffer IDRFModule::execute()
         return buf;
     }
     int instruction = ifidBuf.getInstruction();
-    cout << "IDRF: " << ifidBuf.getNPC() << endl;
     buf.npc = ifidBuf.getNPC();
     int opcode = instruction >> 12;
     int mode = opcode >> 2;

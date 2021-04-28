@@ -2,9 +2,8 @@
  *  MEMModule.cpp   :       Implements the class MEMModule
  * 
  *  Version         :       1.0
- *  Author          :       Vedant Saboo
+ *  Author          :       Vedant Saboo, CS19B074
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 
@@ -23,7 +22,6 @@ MWBuffer MEMModule::execute()
         return buf;
     }
 
-    cout << "MEM: " << emBuf.npc << endl;
     buf.npc = emBuf.npc;
     if (emBuf.load)
     {
@@ -63,7 +61,7 @@ MWBuffer MEMModule::execute()
     } 
     else 
     {
-        cerr << "Can't reach here, logical error.\n";
+        //other type of instrcution
     }
     buf.invalid = false;
     ready = true;

@@ -1,10 +1,9 @@
 /**
- *  IDRFModule.cpp  :       Implements the class MWBuffer
+ *  MWModule.cpp    :       Implements the class MWBuffer
  * 
  *  Version         :       1.0
  *  Author          :       Sanchit Gupta
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 

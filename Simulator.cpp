@@ -9,18 +9,6 @@ using namespace std;
 #define DFILE "DCacheData.txt"
 #define RFILE "RegisterData.txt"
 
-// //global variables for the processor
-// extern int total_instructions;
-// extern int arithmetic_instructions;
-// extern int logical_instructions;
-// extern int data_instructions;
-// extern int control_instructions;
-// extern int halt_instructions;
-// extern float cpi;
-// extern int total_stalls;
-// extern int data_stalls;
-// extern int control_stalls;
-
 #include "Processor.h"
 
 int main() {
@@ -31,5 +19,4 @@ int main() {
     finR.open(RFILE);
     processor.setup(finI, finD, finR);
     processor.startup();
-    //processor.testicache();
 }

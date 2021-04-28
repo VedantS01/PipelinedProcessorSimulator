@@ -1,10 +1,9 @@
 /**
- *  ICache.cpp      :       Implements the class ICache
+ *  DCache.cpp      :       Implements the class DCache
  * 
  *  Version         :       1.0
- *  Author          :       Vedant Ashish Saboo
+ *  Author          :       Vedant Saboo (CS19B074)
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 

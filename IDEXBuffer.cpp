@@ -1,10 +1,9 @@
 /**
- *  IDRFModule.cpp  :       Implements the class IDEXBuffer
+ *  IDRFBuffer.cpp  :       Implements the class IDEXBuffer
  * 
  *  Version         :       1.0
- *  Author          :       Sanchit Gupa
+ *  Author          :       Vedant Saboo, CS19B074
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 

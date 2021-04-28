@@ -1,10 +1,9 @@
 /**
- *  IFIDBuffer.cpp  :       Implements the buffer between EX,MW
+ *  EMBuffer.cpp    :       Implements the buffer between EX,MW
  *
  *  Version         :       1.0
  *  Author          :       Parth Ajmera
  *
- *  NOTE            :       IN DEVELOPEMENT STAGE
  *
  **/
 

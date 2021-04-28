@@ -4,7 +4,6 @@
  *  Version         :       1.0
  *  Author          :       Sanchit Gupta
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 

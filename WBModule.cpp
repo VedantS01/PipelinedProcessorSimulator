@@ -1,10 +1,9 @@
 /**
- *  MEMModule.cpp   :       Implements the class WBModule
+ *  WBModule.cpp    :       Implements the class WBModule
  * 
  *  Version         :       1.0
  *  Author          :       Sanchit Gupta
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 
@@ -22,22 +21,10 @@ WBSTATUS WBModule::execute()
         ready = true;
         return status;
     }
-    cout << "WB:" << mwBuf.npc << endl;
     if (mwBuf.aluInstr)
     {
         rf.write(mwBuf.dest, mwBuf.destval);
-        /*
-        if(rf.request_failed)
-        {
-            status.invalid = true;
-            status.ready = false;
-            ready = false;
-            rf.reset();
-            return status;
-        }
-        */
         rf.isWriting[mwBuf.dest] = false;
-        cout << "Written " << mwBuf.destval << " on reg " << mwBuf.dest << endl;
     }
     else if (mwBuf.load)
     {

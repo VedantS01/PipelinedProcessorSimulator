@@ -1,10 +1,9 @@
 /**
- *  IFIDBuffer.cpp  :       Implements the class IFModule
+ *  IFIDBuffer.cpp  :       Implements the class IFIDBuffer
  * 
  *  Version         :       1.0
  *  Author          :       Vedant Ashish Saboo
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 

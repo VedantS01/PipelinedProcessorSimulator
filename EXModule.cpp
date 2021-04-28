@@ -1,10 +1,9 @@
 /**
- *  ALUModule.cpp   :       ALU
+ *  ExModule.cpp    :       Implements class EXModule
  *
  *  Version         :       1.0
- *  Author          :       Parth Ajmera
+ *  Author(s)       :       Vedant Saboo (CS19B074) & Parth Ajmera(CS19B065)
  *
- *  NOTE            :       IN DEVELOPEMENT STAGE
  *
  **/
 
@@ -22,7 +21,6 @@ EMBuffer EXModule::execute()
         return buf;
     }
 
-    cout << "EX: " << idexBuf.npc << endl;
     buf.npc = idexBuf.npc;
     total_instructions++;
     int subop = idexBuf.subop;
@@ -138,9 +136,7 @@ EMBuffer EXModule::execute()
             //calc effective address
             int val1 = idexBuf.npc;
             int val2 = idexBuf.jump_addr;
-                cout << "val1: " << val1 <<" val2:" << val2 ;
-                val2 = val2 << 1;
-                cout << "new : " << val2 << endl;
+            val2 = val2 << 1;
             int val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
 
@@ -166,9 +162,7 @@ EMBuffer EXModule::execute()
                 //calc effective address
                 int val1 = idexBuf.npc;
                 int val2 = idexBuf.jump_addr;
-                cout << "val1: " << val1 <<" val2:" << val2 ;
                 val2 = (val2 << 1) & 0xff;
-                cout << "new : " << val2 << endl;
                 int val = alu.adder(val1, val2, 0);
                 buf.aluOutput = val;
                 

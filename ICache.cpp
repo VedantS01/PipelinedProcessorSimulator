@@ -2,9 +2,8 @@
  *  ICache.cpp      :       Implements the class ICache
  * 
  *  Version         :       1.0
- *  Author          :       Vedant Ashish Saboo
+ *  Author          :       Vedant Saboo (CS19B074)
  * 
- *  NOTE            :       IN DEVELOPEMENT STAGE
  * 
  **/
 
@@ -28,4 +27,11 @@ int ICache::request(int addr) {
     int ret = little * 256;
     ret += big;
     return ret;
+}
+
+void ICache::write(int addr, int item) {
+    int set = addr >> 2;
+    int offset = addr & 3;
+    data[set].offset[offset] = item >> 8;
+    data[set].offset[offset] = item & 0xff;
 }

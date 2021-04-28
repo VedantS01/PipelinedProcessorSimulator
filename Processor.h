@@ -1,7 +1,10 @@
 /**
  *  Processor.h     :       H file for the simulator
  * 
- *  NOTE            :       DEVELOPEMENT STAGE
+ *  Version         :       1.0
+ * 
+ *  Author(s)       :       Vedant Saboo (CS19B074), Sanchit Gupta(CS19B071), Parth Ajmera (CS19B065)
+ * 
  **/
 
 #ifndef PROCESSOR_H
@@ -97,6 +100,7 @@ class ICache
 public:
     IBlock data[NUMSETS];
     int request(int);
+    void write(int, int);
 };
 
 class DCache
@@ -406,9 +410,6 @@ public:
     void startup();
     void cycle();
     void output();
-
-    //test individual elements
-    void testicache();
 };
 
 #endif
