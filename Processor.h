@@ -287,6 +287,8 @@ class MWBuffer
 public:
     flag load;
     flag aluInstr;
+    //issue halt signal to processor
+    flag HALT_SIGNAL;
 
     int dest;
     int destval;

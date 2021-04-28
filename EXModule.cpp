@@ -159,6 +159,13 @@ EMBuffer EXModule::execute()
             //keep same pc value;
 
         }
+    else if (idexBuf.HALT_SIGNAL)
+        {
+            buf.HALT_SIGNAL = true;
+            buf.invalid = false;
+            ready = false;
+            return buf;
+        }
     buf.invalid = false;
     buf.ready = true;
     ready = true;

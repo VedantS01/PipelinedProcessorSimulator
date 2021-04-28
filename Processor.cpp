@@ -101,23 +101,11 @@ void Processor::startup()
     IF.go = true;
     wbstatus.invalid = true;
     wbstatus.ready = true;
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
+    while (! COMPLETE)
+    {
+        cycle();
+    }
+    
 }
 
 void Processor::cycle()
@@ -127,40 +115,6 @@ void Processor::cycle()
 
     // set null
     clock_cycle++;
-    // int stages_active = 0;
-    /* WILL WORK ON THIS ONE
-    if (!stall[0])
-    {
-        IFID = IF.execute();
-        // stages_active++;
-    }
-    if (!stall[1])
-    {
-        IDEX = IDRF.execute();
-    }
-
-    HALT_SIGNAL = IDEX.HALT_SIGNAL;
-
-    if (!stall[2])
-    {
-        EM = EX.execute();
-    }
-    if (!stall[3])
-    {
-        MW = MEM.execute();
-    }
-    if (!stall[4])
-    {
-        WB.execute();
-    }
-
-    IDRF.ifidBuf = IFID;
-    EX.idexBuf = IDEX;
-    MEM.emBuf = EM;
-    WB.mwBuf = MW;
-
-    */
-    //cout << "1:\n";
 
     int flag1 = 0;
 
@@ -184,65 +138,6 @@ void Processor::cycle()
     {
         wbstatus = WB.execute();
     }
-
-    // //forward
-    // if (wbstatus.ready)
-    // {
-    //     WB.mwBuf = MW;
-    //     if (MW.ready)
-    //     {
-    //         MEM.emBuf = EM;
-    //         if (EM.ready)
-    //         {
-    //             EX.idexBuf = IDEX;
-    //             if (IDEX.ready)
-    //             {
-    //                 IDRF.ifidBuf = IFID;
-    //                 if (IFID.ready) 
-    //                 {
-    //                     IF.go = true;
-    //                 }
-    //                 else
-    //                 {
-    //                     cout << "Blocking-4" << endl;
-    //                     IF.go = false;
-    //                 }
-    //             }
-    //             else
-    //             {
-    //                 cout << "Blocking-3" << endl;
-    //                 IF.go = false;
-    //                 IDRF.ifidBuf.ready = false;
-    //             }
-    //         }
-    //         else
-    //         {
-    //             cout << "Blocking-2" << endl;
-    //             IF.go = false;
-    //             IDRF.ifidBuf.ready = false;
-    //             EX.idexBuf.ready = false;
-    //         }
-    //     }
-    //     else
-    //     {
-    //         cout << "Blocking-1" << endl;
-    //         IF.go = false;
-    //         IDRF.ifidBuf.ready = false;
-    //         EX.idexBuf.ready = false;
-    //         MEM.emBuf.ready = false;
-    //         // IDRF.ifidBuf.ready = false;
-    //     }
-    // }
-    // else
-    // {
-    //     cout << "Blocking" << endl;
-    //     IF.go = false;
-    //     IDRF.ifidBuf.ready = false;
-    //     EX.idexBuf.ready = false;
-    //     MEM.emBuf.ready = false;
-    //     // IDRF.ifidBuf.ready = false;
-    //     WB.mwBuf.ready = false;
-    // }
 
     //forward
     if (WB.ready)
@@ -301,50 +196,15 @@ void Processor::cycle()
         MEM.emBuf.ready = false;
         // IDRF.ifidBuf.ready = false;
         WB.mwBuf.ready = false;
+        COMPLETE = true;
     }
-                   
-/*
-if (flag1 == 0)
-{
-}
-else if (flag1 == 1)
-{
-    cout << "Yeahhhhhh";
-    IDRF.ifidBuf.invalid = false;
-    if (IDRF.ifidBuf.ready)
+    /*             
+    if (clock_cycle == 10)
     {
-        cout << "Ready";
-        IF.go = true;
+        HALT_SIGNAL = true;
+        COMPLETE = true;
     }
-}
-else if (flag1 == 2)
-{
-    cout << "Yeahhhhhh";
-    EX.idexBuf.invalid = false;
-    if (EX.idexBuf.ready)
-    {
-        cout << "Ready";
-        IF.go = true;
-    }
-}
-else if (flag1 == 3)
-{
-    cout << "Yeahhhhhh";
-    MEM.emBuf.invalid = false;
-    if (MEM.emBuf.ready)
-    {
-        cout << "Ready";
-        IF.go = true;
-    }
-}
-
-cout << IDRF.ifidBuf.invalid << "Informative" << endl;
-*/
-if (clock_cycle == 10)
-{
-    HALT_SIGNAL = true;
-    COMPLETE = true;
-}
+    */
 //pc.increment();
 }
 

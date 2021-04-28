@@ -51,6 +51,13 @@ MWBuffer MEMModule::execute()
         buf.destval = emBuf.aluOutput;
         buf.validdest = true;
         buf.val = emBuf.aluOutput;
+    }
+    else if(emBuf.HALT_SIGNAL)
+    {
+        buf.HALT_SIGNAL = true;
+        buf.invalid = false;
+        ready = false;
+        return buf;
     } 
     else 
     {

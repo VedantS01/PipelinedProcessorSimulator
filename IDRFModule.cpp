@@ -271,6 +271,10 @@ IDEXBuffer IDRFModule::execute()
     {
         //issue halt signal
         buf.HALT_SIGNAL = true;
+        buf.invalid = false;
+        buf.ready = true;
+        ready = false;
+        return buf;
     }
     buf.invalid = false;
     buf.ready = true;

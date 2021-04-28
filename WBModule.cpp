@@ -34,6 +34,13 @@ WBSTATUS WBModule::execute()
         rf.isWriting[mwBuf.dest] = false;
         cout << "Written: " << mwBuf.lmd << " on register " << mwBuf.dest << endl;
     }
+    else if (mwBuf.HALT_SIGNAL)
+    {
+        status.invalid = false;
+        status.ready = false;
+        ready = false;
+        return status;
+    }
     status.invalid = false;
     status.ready = true;
     ready = true;

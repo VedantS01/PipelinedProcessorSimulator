@@ -16,6 +16,7 @@ MWBuffer::MWBuffer()
 {
     invalid = true;
     ready = true;
+    HALT_SIGNAL = false;
 
     load = false;
     aluInstr = false;
