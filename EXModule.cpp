@@ -117,7 +117,7 @@ EMBuffer EXModule::execute()
     else if(idexBuf.store)
         {
             // buf.writeToRegister = false;
-            buf.load = false;
+            buf.store = true;
             //calc effective address
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.offset;

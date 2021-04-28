@@ -120,6 +120,7 @@ void Processor::cycle()
     {
         wbstatus = WB.execute();
     }
+    rf.reset();
 
     //forward
     if (WB.ready)
