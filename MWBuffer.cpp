@@ -28,4 +28,6 @@ MWBuffer::MWBuffer()
     val;
 
     lmd;
+
+    npc = -1;
 }

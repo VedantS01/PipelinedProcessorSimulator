@@ -240,6 +240,8 @@ public:
     flag HALT_SIGNAL;
 
     int aluOutput;
+    int npc;
+
     flag load;
     flag store;
     flag writeToRegister;
@@ -296,6 +298,9 @@ public:
 
     int val;
     int lmd;
+
+    int npc; 
+
     flag invalid;
     flag ready;
     MWBuffer();
@@ -390,6 +395,7 @@ public:
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();
+    void output();
 
     //test individual elements
     void testicache();

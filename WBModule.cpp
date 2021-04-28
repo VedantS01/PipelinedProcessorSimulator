@@ -22,17 +22,16 @@ WBSTATUS WBModule::execute()
         ready = true;
         return status;
     }
+    cout << "WB:" << mwBuf.npc << endl;
     if (mwBuf.aluInstr)
     {
         rf.write(mwBuf.dest, mwBuf.val);
         rf.isWriting[mwBuf.dest] = false;
-        cout << "Written in reg-write: " << mwBuf.val << " on register " << mwBuf.dest << endl; 
     }
     else if (mwBuf.load)
     {
         rf.write(mwBuf.dest, mwBuf.lmd);
         rf.isWriting[mwBuf.dest] = false;
-        cout << "Written: " << mwBuf.lmd << " on register " << mwBuf.dest << endl;
     }
     else if (mwBuf.HALT_SIGNAL)
     {

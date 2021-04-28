@@ -66,26 +66,6 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
         rf.R[i].val = v;
     }
 
-    /*
-    //set up modules
-    //IF Module initialisations
-    IF.I$ = I$;
-    IF.pc = pc;
-    
-    //IDRFModule initialisations
-    IDRF.rf = rf;
-
-    //EX Module initialisations
-    EX.alu = alu;
-
-    //MEM Module initialisations
-    MEM.D$ = D$;
-
-    //WB Module initialisations
-    WB.D$ = D$;
-    //WB.I$ = I$;
-    WB.rf = rf;
-    */
 }
 
 void Processor::startup()
@@ -105,6 +85,8 @@ void Processor::startup()
     {
         cycle();
     }
+
+    output();
     
 }
 
@@ -222,25 +204,23 @@ void Processor::testicache()
     fout.close();
 }
 
-/*
-Processor::Processor() {
-    //set up modules
-    //IF Module initialisations
-    IF.I$ = I$;
-    IF.pc = pc;
+void Processor::output() {
+    ofstream fout;
     
-    //IDRFModule initialisations
-    IDRF.rf = rf;
+    //rf
+    fout.open("RF.out.txt");
+    for(int i = 0; i < NUM_REGS; i++) {
+        fout << hex << rf.R[i].read() << endl;
+    }
+    fout.close();
 
-    //EX Module initialisations
-    EX.alu = alu;
-
-    //MEM Module initialisations
-    MEM.D$ = D$;
-
-    //WB Module initialisations
-    WB.D$ = D$;
-    //WB.I$ = I$;
-    WB.rf = rf;
+    //D$
+    fout.open("D$.out.txt");
+    for(int i = 0; i < NUMSETS; i++) {
+        fout << hex << D$.data[i].offset[0] << endl;
+        fout << hex << D$.data[i].offset[1] << endl;
+        fout << hex << D$.data[i].offset[2] << endl;
+        fout << hex << D$.data[i].offset[3] << endl;
+    }
+    fout.close();
 }
-*/

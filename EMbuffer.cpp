@@ -21,6 +21,7 @@ EMBuffer::EMBuffer()
     HALT_SIGNAL = false;
 
     aluOutput = 0;
+    npc = -1;
     load = false;
     store = false;
     writeToRegister = false;

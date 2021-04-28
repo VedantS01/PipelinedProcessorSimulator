@@ -29,7 +29,8 @@ IDEXBuffer IDRFModule::execute()
         return buf;
     }
     int instruction = ifidBuf.getInstruction();
-    cout << "Instruction: " << instruction << endl;
+    cout << "IDRF: " << ifidBuf.getNPC() << endl;
+    buf.npc = ifidBuf.getNPC();
     int opcode = instruction >> 12;
     int mode = opcode >> 2;
     int subop = opcode & 3;
@@ -153,7 +154,6 @@ IDEXBuffer IDRFModule::execute()
     {
         if (subop == 0)
         {
-            cout << "Here!" << endl;
             buf.logical = false;
             buf.arithmetic = false;
             buf.load = true;
@@ -167,7 +167,6 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A])
             {
-                cout << "Illegal" << endl;
                 stall[0] = true;
 
                 stall[1] = true;
@@ -279,11 +278,6 @@ IDEXBuffer IDRFModule::execute()
     buf.invalid = false;
     buf.ready = true;
     ready = true;
-    cout << "Opcode: " << opcode << endl;
-    cout << "operand1:" << buf.dest << endl;
-    cout << "oprand2:" << buf.src1 << endl;
-    cout << "opear3:" << buf.offset << endl;
-    cout << "src2:" << buf.src2 << endl;
     return buf;
 }
 

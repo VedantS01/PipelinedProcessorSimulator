@@ -22,7 +22,9 @@ EMBuffer EXModule::execute()
         buf.invalid = true;
         return buf;
     }
-    
+
+    cout << "EX: " << idexBuf.npc << endl;
+    buf.npc = idexBuf.npc;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {

@@ -23,6 +23,9 @@ MWBuffer MEMModule::execute()
         ready = true;
         return buf;
     }
+
+    cout << "MEM: " << emBuf.npc << endl;
+    buf.npc = emBuf.npc;
     if (emBuf.load)
     {
         buf.load = true;
@@ -34,7 +37,6 @@ MWBuffer MEMModule::execute()
         buf.dest = emBuf.dest;
         buf.destval = d;
         buf.validdest = true;
-        cout << "Loaded data " << d << " in register " << buf.dest << endl;
     }
     else if (emBuf.store)
     {
@@ -61,7 +63,7 @@ MWBuffer MEMModule::execute()
     } 
     else 
     {
-        cout << "Can't reach here, logical error.\n";
+        cerr << "Can't reach here, logical error.\n";
     }
     buf.invalid = false;
     buf.ready = true;
