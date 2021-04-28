@@ -15,7 +15,8 @@ using namespace std;
 WBSTATUS WBModule::execute()
 {
     WBSTATUS status;
-    if(mwBuf.invalid) {
+    if (mwBuf.invalid)
+    {
         status.invalid = true;
         status.ready = true;
         return status;

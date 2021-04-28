@@ -12,7 +12,6 @@
 #include <iostream>
 using namespace std;
 
-
 int signExtend(int x, int s)
 {
     return ((s << 7) | (s << 6) | (s << 5) | (s << 4) | x);
@@ -47,7 +46,8 @@ IDEXBuffer IDRFModule::execute()
         int destA = (instruction >> 8) & 0xf;
         int src1A = (instruction >> 4) & 0xf;
         int src2A = instruction & 0xf;
-        if(subop == 3) {
+        if (subop == 3)
+        {
             if (rf.isWriting[destA])
             {
                 stall[0] = true;
@@ -57,13 +57,15 @@ IDEXBuffer IDRFModule::execute()
                 return buf;
             }
             buf.validsrc1 = false;
-        
+
             buf.validsrc2 = false;
 
             buf.dest = destA;
             buf.destval = rf.read(destA);
             buf.validdest = false; //it will overwritten
-        } else {
+        }
+        else
+        {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
                 stall[0] = true;
@@ -75,7 +77,7 @@ IDEXBuffer IDRFModule::execute()
             buf.src1 = src1A;
             buf.srcval1 = rf.read(src1A);
             buf.validsrc1 = true;
-        
+
             buf.src2 = src2A;
             buf.srcval2 = rf.read(src2A);
             buf.validsrc2 = true;
@@ -83,7 +85,7 @@ IDEXBuffer IDRFModule::execute()
             buf.dest = destA;
             buf.validdest = false;
         }
-        
+
         rf.isWriting[destA] = true;
     }
     else if (mode == 1)
@@ -100,7 +102,8 @@ IDEXBuffer IDRFModule::execute()
         int destA = (instruction >> 8) & 0xf;
         int src1A = (instruction >> 4) & 0xf;
         int src2A = instruction & 0xf;
-        if(subop == 2) {
+        if (subop == 2)
+        {
             if (rf.isWriting[destA] || rf.isWriting[src1A])
             {
                 stall[0] = true;
@@ -112,12 +115,14 @@ IDEXBuffer IDRFModule::execute()
             buf.src1 = src1A;
             buf.srcval1 = rf.read(src1A);
             buf.validsrc1 = true;
-        
+
             buf.validsrc2 = false;
 
             buf.dest = destA;
             buf.validdest = false;
-        } else {
+        }
+        else
+        {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
                 stall[0] = true;
@@ -129,7 +134,7 @@ IDEXBuffer IDRFModule::execute()
             buf.src1 = src1A;
             buf.srcval1 = rf.read(src1A);
             buf.validsrc1 = true;
-        
+
             buf.src2 = src2A;
             buf.srcval2 = rf.read(src2A);
             buf.validsrc2 = true;
@@ -169,7 +174,7 @@ IDEXBuffer IDRFModule::execute()
             buf.src1 = src1A;
             buf.srcval1 = rf.read(src1A);
             buf.validsrc1 = true;
-        
+
             //src2 is invalid
             buf.validsrc2 = false;
 
@@ -208,7 +213,7 @@ IDEXBuffer IDRFModule::execute()
             buf.src1 = src1A;
             buf.srcval1 = rf.read(src1A);
             buf.validsrc1 = true;
-        
+
             //src2 is invalid
             buf.validsrc2 = false;
 

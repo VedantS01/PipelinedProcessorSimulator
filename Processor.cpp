@@ -123,7 +123,10 @@ void Processor::startup()
 void Processor::cycle()
 {
     // processor clock cycle
+    streambuf *orig_buf = cout.rdbuf();
 
+    // set null
+    cout.rdbuf(NULL);
     clock_cycle++;
     // int stages_active = 0;
     /* WILL WORK ON THIS ONE
@@ -159,63 +162,173 @@ void Processor::cycle()
 
     */
     //cout << "1:\n";
-    if(IF.go) {
+
+    int flag1 = 0;
+
+    cout << "IF.GO" << IF.go << endl;
+    if (IF.go)
+    {
         IFID = IF.execute();
     }
-    if(!IDRF.ifidBuf.invalid)
-        //cout << "3:\n";
+    if (!IDRF.ifidBuf.invalid)
+    {
+        cout << "counting" << endl;
         IDEX = IDRF.execute();
-    if(!EX.idexBuf.invalid)
+    }
+    else
+    {
+        flag1 = 1;
+        cout << "Yeahhhhhh";
+        IDRF.ifidBuf.invalid = false;
+        if (IDRF.ifidBuf.ready)
+        {
+            cout << "Ready";
+            IF.go = true;
+        }
+    }
+    if (!EX.idexBuf.invalid)
+    {
         EM = EX.execute();
-    if(!MEM.emBuf.invalid)
+    }
+    else
+    {
+        flag1 = 2;
+        cout << "Yeahhhhhh";
+        EX.idexBuf.invalid = false;
+        if (EX.idexBuf.ready)
+        {
+            cout << "Ready";
+            IF.go = true;
+        }
+    }
+    if (!MEM.emBuf.invalid)
+    {
         MW = MEM.execute();
-    if(!WB.mwBuf.invalid)
+    }
+    else
+    {
+        flag1 = 3;
+        cout << "Yeahhhhhh";
+        MEM.emBuf.invalid = false;
+        if (MEM.emBuf.ready)
+        {
+            cout << "Ready";
+            IF.go = true;
+        }
+    }
+    if (!WB.mwBuf.invalid)
+    {
         wbstatus = WB.execute();
+    }
+    else
+    {
+        flag1 = 4;
+        cout << "Yeahhhhhh";
+        WB.mwBuf.invalid = false;
+        if (WB.mwBuf.ready)
+        {
+            cout << "Ready";
+            IF.go = true;
+        }
+    }
 
     //forward
-    if(wbstatus.ready) {
+    if (wbstatus.ready)
+    {
         WB.mwBuf = MW;
-        if(MW.ready) {
+        if (MW.ready)
+        {
             MEM.emBuf = EM;
-            if(EM.ready) {
+            if (EM.ready)
+            {
                 EX.idexBuf = IDEX;
-                if(IDEX.ready) {
-                    IDRF.ifidBuf = IFID;
-                    if(IFID.ready) {
-                        //cout << "2:\n";
-                        IF.go = true;
-                    } else {
-                        IF.go = false;
-                    }
-                } else {
-                    IF.go = false;
-                    IDRF.ifidBuf.invalid = true;
-                }
-            } else {
-                IF.go = false;
-                IDRF.ifidBuf.invalid = true;
-                EX.idexBuf.invalid = true;
+                //cout << "2:\n";
+                IF.go = true;
             }
-        } else {
+            else
+            {
+                cout << "Blocking-4" << endl;
+                IF.go = false;
+            }
+        }
+        else
+        {
+            cout << "Blocking-3" << endl;
             IF.go = false;
             IDRF.ifidBuf.invalid = true;
-            EX.idexBuf.invalid = true;
-            IDRF.ifidBuf.invalid = true;
         }
-    } else {
+    }
+    else
+    {
+        cout << "Blocking-2" << endl;
         IF.go = false;
         IDRF.ifidBuf.invalid = true;
         EX.idexBuf.invalid = true;
-        IDRF.ifidBuf.invalid = true;
-        WB.mwBuf.invalid = true;
     }
+}
+else
+{
+    cout << "Blocking-1" << endl;
+    IF.go = false;
+    IDRF.ifidBuf.invalid = true;
+    EX.idexBuf.invalid = true;
+    MEM.emBuf.invalid = true;
+    // IDRF.ifidBuf.invalid = true;
+}
+}
+else
+{
+    cout << "Blocking" << endl;
+    IF.go = false;
+    IDRF.ifidBuf.invalid = true;
+    EX.idexBuf.invalid = true;
+    MEM.emBuf.invalid = true;
+    // IDRF.ifidBuf.invalid = true;
+    WB.mwBuf.invalid = true;
+}
 
-    if (clock_cycle == 10)
+if (flag1 == 0)
+{
+}
+else if (flag1 == 1)
+{
+    cout << "Yeahhhhhh";
+    IDRF.ifidBuf.invalid = false;
+    if (IDRF.ifidBuf.ready)
     {
-        HALT_SIGNAL = true;
-        COMPLETE = true;
+        cout << "Ready";
+        IF.go = true;
     }
-    //pc.increment();
+}
+else if (flag1 == 2)
+{
+    cout << "Yeahhhhhh";
+    EX.idexBuf.invalid = false;
+    if (EX.idexBuf.ready)
+    {
+        cout << "Ready";
+        IF.go = true;
+    }
+}
+else if (flag1 == 3)
+{
+    cout << "Yeahhhhhh";
+    MEM.emBuf.invalid = false;
+    if (MEM.emBuf.ready)
+    {
+        cout << "Ready";
+        IF.go = true;
+    }
+}
+
+cout << IDRF.ifidBuf.invalid << "Informative" << endl;
+
+if (clock_cycle == 10)
+{
+    HALT_SIGNAL = true;
+    COMPLETE = true;
+}
+//pc.increment();
 }
 
 void Processor::testicache()

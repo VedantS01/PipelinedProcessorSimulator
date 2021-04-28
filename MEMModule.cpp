@@ -16,7 +16,8 @@ MWBuffer MEMModule::execute()
 {
     MWBuffer buf;
     cout << "mem " << emBuf.aluOutput << endl;
-    if(emBuf.invalid) {
+    if (emBuf.invalid)
+    {
         cout << "invalid mem:" << endl;
         buf.invalid = true;
         buf.ready = true;
