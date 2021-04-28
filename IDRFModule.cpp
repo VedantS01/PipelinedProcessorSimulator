@@ -24,11 +24,13 @@ IDEXBuffer IDRFModule::execute()
     if (ifidBuf.invalid)
     {
         buf.invalid = true;
-        buf.ready = true;
+        //buf.ready = true;
+        ready = true;
         return buf;
     }
     int instruction = ifidBuf.getInstruction();
-    cout << "Instruction: " << instruction << endl;
+    cout << "IDRF: " << ifidBuf.getNPC() << endl;
+    buf.npc = ifidBuf.getNPC();
     int opcode = instruction >> 12;
     int mode = opcode >> 2;
     int subop = opcode & 3;
@@ -53,7 +55,8 @@ IDEXBuffer IDRFModule::execute()
                 stall[0] = true;
                 stall[1] = true;
                 buf.invalid = true;
-                buf.ready = false;
+                //buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.validsrc1 = false;
@@ -68,10 +71,11 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -106,10 +110,11 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[destA] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -125,10 +130,11 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             buf.src1 = src1A;
@@ -148,7 +154,6 @@ IDEXBuffer IDRFModule::execute()
     {
         if (subop == 0)
         {
-            cout << "Here!" << endl;
             buf.logical = false;
             buf.arithmetic = false;
             buf.load = true;
@@ -162,12 +167,12 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A])
             {
-                cout << "Illegal" << endl;
-                stall[0] = true;
+                // stall[0] = true;
 
-                stall[1] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             //base register
@@ -202,11 +207,12 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A] || rf.isWriting[destA])
             {
-                stall[0] = true;
+                // stall[0] = true;
 
-                stall[1] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
+                ready = false;
                 return buf;
             }
             //base register
@@ -235,9 +241,14 @@ IDEXBuffer IDRFModule::execute()
             buf.load = false;
             buf.jump = true;
             buf.bneq = false;
-            stall[0] = true;
-            stall[1] = true;
+            // stall[0] = true;
+            // stall[1] = true;
             //branch issues;
+
+            ready = false;
+            buf.invalid = false;
+            return buf;
+            // BRANCH = 2;
         }
         else
         {
@@ -256,21 +267,27 @@ IDEXBuffer IDRFModule::execute()
             buf.dest = destA;
             buf.destval = dest;
             buf.validdest = true;
-            stall[0] = true;
-            stall[1] = true;
+            // stall[0] = true;
+            // stall[1] = true;
+
+            ready = false;
+            buf.invalid = false;
+            return buf;
+            // BRANCH = 2;
         }
     }
     else if (mode == 3)
     {
         //issue halt signal
         buf.HALT_SIGNAL = true;
+        buf.invalid = false;
+        buf.ready = true;
+        ready = false;
+        return buf;
     }
     buf.invalid = false;
     buf.ready = true;
-    cout << "Opcode: " << opcode << endl;
-    cout << "operand1:" << buf.dest << endl;
-    cout << "oprand2:" << buf.src1 << endl;
-    cout << "opear3:" << buf.offset << endl;
+    ready = true;
     return buf;
 }
 

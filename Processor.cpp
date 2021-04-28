@@ -66,26 +66,6 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
         rf.R[i].val = v;
     }
 
-    /*
-    //set up modules
-    //IF Module initialisations
-    IF.I$ = I$;
-    IF.pc = pc;
-    
-    //IDRFModule initialisations
-    IDRF.rf = rf;
-
-    //EX Module initialisations
-    EX.alu = alu;
-
-    //MEM Module initialisations
-    MEM.D$ = D$;
-
-    //WB Module initialisations
-    WB.D$ = D$;
-    //WB.I$ = I$;
-    WB.rf = rf;
-    */
 }
 
 void Processor::startup()
@@ -97,27 +77,18 @@ void Processor::startup()
     pc.val = 0;
     HALT_SIGNAL = false;
     COMPLETE = false;
+    FLUSH = false;
     clock_cycle = 0;
     IF.go = true;
     wbstatus.invalid = true;
     wbstatus.ready = true;
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
-    cycle();
+    while (! COMPLETE)
+    {
+        cycle();
+    }
+
+    output();
+    
 }
 
 void Processor::cycle()
@@ -126,209 +97,97 @@ void Processor::cycle()
     streambuf *orig_buf = cout.rdbuf();
 
     // set null
-    cout.rdbuf(NULL);
     clock_cycle++;
-    // int stages_active = 0;
-    /* WILL WORK ON THIS ONE
-    if (!stall[0])
-    {
-        IFID = IF.execute();
-        // stages_active++;
-    }
-    if (!stall[1])
-    {
-        IDEX = IDRF.execute();
-    }
-
-    HALT_SIGNAL = IDEX.HALT_SIGNAL;
-
-    if (!stall[2])
-    {
-        EM = EX.execute();
-    }
-    if (!stall[3])
-    {
-        MW = MEM.execute();
-    }
-    if (!stall[4])
-    {
-        WB.execute();
-    }
-
-    IDRF.ifidBuf = IFID;
-    EX.idexBuf = IDEX;
-    MEM.emBuf = EM;
-    WB.mwBuf = MW;
-
-    */
-    //cout << "1:\n";
 
     int flag1 = 0;
 
-    cout << "IF.GO" << IF.go << endl;
     if (IF.go)
     {
         IFID = IF.execute();
     }
     if (!IDRF.ifidBuf.invalid)
     {
-        cout << "counting" << endl;
         IDEX = IDRF.execute();
-    }
-    else
-    {
-        flag1 = 1;
-        cout << "Yeahhhhhh";
-        IDRF.ifidBuf.invalid = false;
-        if (IDRF.ifidBuf.ready)
-        {
-            cout << "Ready";
-            IF.go = true;
-        }
     }
     if (!EX.idexBuf.invalid)
     {
         EM = EX.execute();
     }
-    else
-    {
-        flag1 = 2;
-        cout << "Yeahhhhhh";
-        EX.idexBuf.invalid = false;
-        if (EX.idexBuf.ready)
-        {
-            cout << "Ready";
-            IF.go = true;
-        }
-    }
     if (!MEM.emBuf.invalid)
     {
         MW = MEM.execute();
-    }
-    else
-    {
-        flag1 = 3;
-        cout << "Yeahhhhhh";
-        MEM.emBuf.invalid = false;
-        if (MEM.emBuf.ready)
-        {
-            cout << "Ready";
-            IF.go = true;
-        }
     }
     if (!WB.mwBuf.invalid)
     {
         wbstatus = WB.execute();
     }
-    else
-    {
-        flag1 = 4;
-        cout << "Yeahhhhhh";
-        WB.mwBuf.invalid = false;
-        if (WB.mwBuf.ready)
-        {
-            cout << "Ready";
-            IF.go = true;
-        }
-    }
+    rf.reset();
 
     //forward
-    if (wbstatus.ready)
+    if (WB.ready)
     {
         WB.mwBuf = MW;
-        if (MW.ready)
+        if (MEM.ready)
         {
             MEM.emBuf = EM;
-            if (EM.ready)
+            if (EX.ready)
             {
                 EX.idexBuf = IDEX;
-                //cout << "2:\n";
-                IF.go = true;
+                if (IDRF.ready)
+                {
+                    IDRF.ifidBuf = IFID;
+                    if (IF.ready) 
+                    {
+                        IF.go = true;
+                    }
+                    else
+                    {
+                        cout << "Blocking-4" << endl;
+                        IF.go = false;
+                    }
+                }
+                else
+                {
+                    cout << "Blocking-3" << endl;
+                    IF.go = false;
+                    IDRF.ifidBuf.ready = false;
+                }
             }
             else
             {
-                cout << "Blocking-4" << endl;
+                cout << "Blocking-2" << endl;
                 IF.go = false;
+                IDRF.ifidBuf.ready = false;
+                EX.idexBuf.ready = false;
             }
         }
         else
         {
-            cout << "Blocking-3" << endl;
+            cout << "Blocking-1" << endl;
             IF.go = false;
-            IDRF.ifidBuf.invalid = true;
+            IDRF.ifidBuf.ready = false;
+            EX.idexBuf.ready = false;
+            MEM.emBuf.ready = false;
+            // IDRF.ifidBuf.ready = false;
         }
     }
     else
     {
-        cout << "Blocking-2" << endl;
+        cout << "Blocking" << endl;
         IF.go = false;
-        IDRF.ifidBuf.invalid = true;
-        EX.idexBuf.invalid = true;
+        IDRF.ifidBuf.ready = false;
+        EX.idexBuf.ready = false;
+        MEM.emBuf.ready = false;
+        // IDRF.ifidBuf.ready = false;
+        WB.mwBuf.ready = false;
+        COMPLETE = true;
     }
-}
-else
-{
-    cout << "Blocking-1" << endl;
-    IF.go = false;
-    IDRF.ifidBuf.invalid = true;
-    EX.idexBuf.invalid = true;
-    MEM.emBuf.invalid = true;
-    // IDRF.ifidBuf.invalid = true;
-}
-}
-else
-{
-    cout << "Blocking" << endl;
-    IF.go = false;
-    IDRF.ifidBuf.invalid = true;
-    EX.idexBuf.invalid = true;
-    MEM.emBuf.invalid = true;
-    // IDRF.ifidBuf.invalid = true;
-    WB.mwBuf.invalid = true;
-}
-
-if (flag1 == 0)
-{
-}
-else if (flag1 == 1)
-{
-    cout << "Yeahhhhhh";
-    IDRF.ifidBuf.invalid = false;
-    if (IDRF.ifidBuf.ready)
-    {
-        cout << "Ready";
+    if(FLUSH) {
         IF.go = true;
+        IDRF.ready = true;
+        //IFID.invalid = true;
+        FLUSH = false;
     }
-}
-else if (flag1 == 2)
-{
-    cout << "Yeahhhhhh";
-    EX.idexBuf.invalid = false;
-    if (EX.idexBuf.ready)
-    {
-        cout << "Ready";
-        IF.go = true;
-    }
-}
-else if (flag1 == 3)
-{
-    cout << "Yeahhhhhh";
-    MEM.emBuf.invalid = false;
-    if (MEM.emBuf.ready)
-    {
-        cout << "Ready";
-        IF.go = true;
-    }
-}
-
-cout << IDRF.ifidBuf.invalid << "Informative" << endl;
-
-if (clock_cycle == 10)
-{
-    HALT_SIGNAL = true;
-    COMPLETE = true;
-}
-//pc.increment();
 }
 
 void Processor::testicache()
@@ -345,25 +204,23 @@ void Processor::testicache()
     fout.close();
 }
 
-/*
-Processor::Processor() {
-    //set up modules
-    //IF Module initialisations
-    IF.I$ = I$;
-    IF.pc = pc;
+void Processor::output() {
+    ofstream fout;
     
-    //IDRFModule initialisations
-    IDRF.rf = rf;
+    //rf
+    fout.open("RF.out.txt");
+    for(int i = 0; i < NUM_REGS; i++) {
+        fout << hex << rf.R[i].read() << endl;
+    }
+    fout.close();
 
-    //EX Module initialisations
-    EX.alu = alu;
-
-    //MEM Module initialisations
-    MEM.D$ = D$;
-
-    //WB Module initialisations
-    WB.D$ = D$;
-    //WB.I$ = I$;
-    WB.rf = rf;
+    //D$
+    fout.open("D$.out.txt");
+    for(int i = 0; i < NUMSETS; i++) {
+        fout << hex << D$.data[i].offset[0] << endl;
+        fout << hex << D$.data[i].offset[1] << endl;
+        fout << hex << D$.data[i].offset[2] << endl;
+        fout << hex << D$.data[i].offset[3] << endl;
+    }
+    fout.close();
 }
-*/

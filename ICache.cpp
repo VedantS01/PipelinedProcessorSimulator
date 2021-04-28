@@ -25,7 +25,7 @@ int ICache::request(int addr) {
     }
     offset++;
     int big = data[set].offset[offset];
-    int ret = big * 256;
-    ret += little;
+    int ret = little * 256;
+    ret += big;
     return ret;
 }

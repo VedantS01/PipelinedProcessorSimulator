@@ -15,14 +15,17 @@ using namespace std;
 MWBuffer MEMModule::execute()
 {
     MWBuffer buf;
-    cout << "mem " << emBuf.aluOutput << endl;
+    
     if (emBuf.invalid)
     {
-        cout << "invalid mem:" << endl;
         buf.invalid = true;
         buf.ready = true;
+        ready = true;
         return buf;
     }
+
+    cout << "MEM: " << emBuf.npc << endl;
+    buf.npc = emBuf.npc;
     if (emBuf.load)
     {
         buf.load = true;
@@ -32,7 +35,8 @@ MWBuffer MEMModule::execute()
         LMD.write(d);
         buf.lmd = d;
         buf.dest = emBuf.dest;
-        cout << "Loaded data " << d << " in register " << buf.dest << endl;
+        buf.destval = d;
+        buf.validdest = true;
     }
     else if (emBuf.store)
     {
@@ -41,14 +45,28 @@ MWBuffer MEMModule::execute()
         //here, emBuf.aluOut is m address and emBuf.dest is register contents
         D$.write(emBuf.aluOutput, emBuf.dest);
     }
-    else
+    else if(emBuf.writeToRegister)
     {
         buf.aluInstr = true;
         buf.load = false;
         buf.dest = emBuf.dest;
+        buf.destval = emBuf.aluOutput;
+        buf.validdest = true;
         buf.val = emBuf.aluOutput;
+    }
+    else if(emBuf.HALT_SIGNAL)
+    {
+        buf.HALT_SIGNAL = true;
+        buf.invalid = false;
+        ready = false;
+        return buf;
+    } 
+    else 
+    {
+        cerr << "Can't reach here, logical error.\n";
     }
     buf.invalid = false;
     buf.ready = true;
+    ready = true;
     return buf;
 }

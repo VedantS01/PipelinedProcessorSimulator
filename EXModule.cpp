@@ -18,83 +18,69 @@ EMBuffer EXModule::execute()
     buf.invalid = true;
     buf.ready = true;
     if(idexBuf.invalid) {
+        ready = true;
+        buf.invalid = true;
         return buf;
     }
-    
-    cout << "idex operand1:" << idexBuf.dest << endl;
-    cout << "idex oprand2:" << idexBuf.src1 << endl;
-    cout << "idex opear3:" << idexBuf.offset << endl;
-    if(idexBuf.arithmetic || idexBuf.logical)
-    cout << "idex arith" << endl;
+
+    cout << "EX: " << idexBuf.npc << endl;
+    buf.npc = idexBuf.npc;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
-        buf.writeToRegister = true;
+        int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
             //incrementer
-            int val1 = idexBuf.srcval1;
-            int val2 = inc.read();
-            val1 = alu.adder(val1, val2, 0);
-            buf.aluOutput = val1;
-            buf.destval = val1;
-            buf.validdest = true;
+            val1 = idexBuf.destval;
+            val2 = inc.read();
+            val = alu.adder(val1, val2, 0);
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
             //multiplier
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
             //TODO: sign extend and etc in case result is not coming right
-            int val = alu.mul(val1, val2);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
+            val = alu.mul(val1, val2);
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
             //subtract
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
             //TODO: sign extend and etc in case result is not coming right
-            int val = alu.adder(val1, val2, 1);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
+            val = alu.adder(val1, val2, 1);
         }
         else //subop=0
         {
             //add
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
             //TODO: sign extend and etc in case result is not coming right
-            int val = alu.adder(val1, val2, 0);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
+            val = alu.adder(val1, val2, 0);
         }
+        buf.writeToRegister = true;
+        buf.dest = idexBuf.dest;
+        buf.aluOutput = val;
+        buf.destval = val;
+        buf.validdest = true;
     }
     else if(idexBuf.logical)   //mode=1
     {
-        buf.writeToRegister = true;
+        int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
             //xor
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
             int val = alu.XOR(val1, val2);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
             //not
             int val1 = idexBuf.srcval1;
             int val = alu.NOT(val1);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
@@ -102,9 +88,6 @@ EMBuffer EXModule::execute()
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
             int val = alu.OR(val1, val2);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
         }
         else //subop=0
         {
@@ -112,14 +95,16 @@ EMBuffer EXModule::execute()
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.srcval2;
             int val = alu.AND(val1, val2);
-            buf.aluOutput = val;
-            buf.destval = val;
-            buf.validdest = true;
         }
+        buf.writeToRegister = true;
+        buf.dest = idexBuf.dest;
+        buf.aluOutput = val;
+        buf.destval = val;
+        buf.validdest = true;
     }
     else if(idexBuf.load)
         {
-            buf.writeToRegister = false;
+            // buf.writeToRegister = false;
             buf.load = true;
             //calc effective address
             int val1 = idexBuf.srcval1;
@@ -128,12 +113,11 @@ EMBuffer EXModule::execute()
             buf.aluOutput = val;
             buf.dest = idexBuf.dest;
             buf.validdest = idexBuf.validdest;
-            cout << "Actual :" << val << endl;
         }
     else if(idexBuf.store)
         {
-            buf.writeToRegister = false;
-            buf.load = false;
+            // buf.writeToRegister = false;
+            buf.store = true;
             //calc effective address
             int val1 = idexBuf.srcval1;
             int val2 = idexBuf.offset;
@@ -145,7 +129,7 @@ EMBuffer EXModule::execute()
         }
     else if(idexBuf.jump)
         {
-            buf.writeToRegister = false;
+            // buf.writeToRegister = false;
             //calc effective address
             int val1 = idexBuf.npc;
             int val2 = idexBuf.jump_addr;
@@ -153,10 +137,17 @@ EMBuffer EXModule::execute()
             buf.aluOutput = val;
 
             //set pc new value
+            pc.write(val);
+
+            //generate go flush signal
+            FLUSH = true;
+            buf.invalid = true;
+            ready = true;
+            return buf;
         }
     else if(idexBuf.bneq)
         {
-            buf.writeToRegister = false;
+            // buf.writeToRegister = false;
             //compare with 0
             int val1 = idexBuf.destval;
             int val2 = 0;
@@ -168,13 +159,31 @@ EMBuffer EXModule::execute()
                 buf.aluOutput = val;
                 
                 //set pc new value
+                pc.write(val);
+
+            }
+            else
+            {
+                //keep same pc value;
+                pc.write(idexBuf.npc);
+                pc.increment();
             }
 
-            //keep same pc value;
-
+            //generate go flush signal
+            FLUSH = true;
+            buf.invalid = true;
+            ready = true;
+            return buf;
+        }
+    else if (idexBuf.HALT_SIGNAL)
+        {
+            buf.HALT_SIGNAL = true;
+            buf.invalid = false;
+            ready = false;
+            return buf;
         }
     buf.invalid = false;
     buf.ready = true;
-    cout << "aluout: " << buf.aluOutput << endl; 
+    ready = true;
     return buf;
 }

@@ -16,4 +16,18 @@ MWBuffer::MWBuffer()
 {
     invalid = true;
     ready = true;
+    HALT_SIGNAL = false;
+
+    load = false;
+    aluInstr = false;
+
+    dest;
+    destval;
+    validdest = false;
+
+    val;
+
+    lmd;
+
+    npc = -1;
 }
