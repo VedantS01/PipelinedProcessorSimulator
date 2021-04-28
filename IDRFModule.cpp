@@ -247,6 +247,7 @@ IDEXBuffer IDRFModule::execute()
 
             ready = false;
             buf.invalid = false;
+            ifidBuf.invalid = true;
             return buf;
             // BRANCH = 2;
         }
@@ -262,6 +263,13 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             rf.getBusy();
             rf.reset();
+            if(rf.isWriting[destA])
+            {
+                buf.invalid = true;
+                buf.ready = false;
+                ready = false;
+                return buf;
+            }
             int dest = rf.read(destA);
             //buf.jump = resolveBranch(dest);
             buf.dest = destA;
@@ -272,6 +280,7 @@ IDEXBuffer IDRFModule::execute()
 
             ready = false;
             buf.invalid = false;
+            ifidBuf.invalid = true;
             return buf;
             // BRANCH = 2;
         }

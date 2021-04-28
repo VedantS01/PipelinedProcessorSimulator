@@ -185,7 +185,8 @@ void Processor::cycle()
     if(FLUSH) {
         IF.go = true;
         IDRF.ready = true;
-        //IFID.invalid = true;
+        IDRF.ifidBuf.invalid = true;
+        EX.idexBuf.invalid = true;
         FLUSH = false;
     }
 }

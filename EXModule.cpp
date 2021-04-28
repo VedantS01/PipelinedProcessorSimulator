@@ -133,6 +133,9 @@ EMBuffer EXModule::execute()
             //calc effective address
             int val1 = idexBuf.npc;
             int val2 = idexBuf.jump_addr;
+                cout << "val1: " << val1 <<" val2:" << val2 ;
+                val2 = val2 << 1;
+                cout << "new : " << val2 << endl;
             int val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
 
@@ -151,11 +154,13 @@ EMBuffer EXModule::execute()
             //compare with 0
             int val1 = idexBuf.destval;
             int val2 = 0;
-            if(val1 ^ val2) {
+            if(val1 == val2) {
                 //calc effective address
                 int val1 = idexBuf.npc;
                 int val2 = idexBuf.jump_addr;
-                val2 = val2 << 1;
+                cout << "val1: " << val1 <<" val2:" << val2 ;
+                val2 = (val2 << 1) & 0xff;
+                cout << "new : " << val2 << endl;
                 int val = alu.adder(val1, val2, 0);
                 buf.aluOutput = val;
                 
@@ -167,7 +172,6 @@ EMBuffer EXModule::execute()
             {
                 //keep same pc value;
                 pc.write(idexBuf.npc);
-                pc.increment();
             }
 
             //generate go flush signal
