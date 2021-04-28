@@ -25,6 +25,18 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
+//global variables for the processor
+extern int total_instructions;
+extern int arithmetic_instructions;
+extern int logical_instructions;
+extern int data_instructions;
+extern int control_instructions;
+extern int halt_instructions;
+extern float cpi;
+extern int total_stalls;
+extern int data_stalls;
+extern int control_stalls;
+
 class Register
 {
 public:

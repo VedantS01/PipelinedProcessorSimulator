@@ -49,6 +49,7 @@ WBSTATUS WBModule::execute()
         status.invalid = false;
         status.ready = false;
         ready = false;
+        mwBuf.invalid = true;
         return status;
     }
     status.invalid = false;

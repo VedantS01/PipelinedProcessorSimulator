@@ -58,6 +58,7 @@ MWBuffer MEMModule::execute()
         buf.HALT_SIGNAL = true;
         buf.invalid = false;
         ready = false;
+        emBuf.invalid = true;
         return buf;
     } 
     else 

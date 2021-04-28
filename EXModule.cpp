@@ -24,9 +24,11 @@ EMBuffer EXModule::execute()
 
     cout << "EX: " << idexBuf.npc << endl;
     buf.npc = idexBuf.npc;
+    total_instructions++;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
+        arithmetic_instructions++;
         int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
@@ -67,6 +69,7 @@ EMBuffer EXModule::execute()
     }
     else if(idexBuf.logical)   //mode=1
     {
+        logical_instructions++;
         int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
@@ -103,6 +106,7 @@ EMBuffer EXModule::execute()
     }
     else if(idexBuf.load)
         {
+            data_instructions++;
             // buf.writeToRegister = false;
             buf.load = true;
             //calc effective address
@@ -115,6 +119,7 @@ EMBuffer EXModule::execute()
         }
     else if(idexBuf.store)
         {
+            data_instructions++;
             // buf.writeToRegister = false;
             buf.store = true;
             //calc effective address
@@ -128,6 +133,7 @@ EMBuffer EXModule::execute()
         }
     else if(idexBuf.jump)
         {
+            control_instructions++;
             // buf.writeToRegister = false;
             //calc effective address
             int val1 = idexBuf.npc;
@@ -143,12 +149,15 @@ EMBuffer EXModule::execute()
 
             //generate go flush signal
             FLUSH = true;
+            control_stalls += 2;
+            total_stalls += 2;
             buf.invalid = true;
             ready = true;
             return buf;
         }
     else if(idexBuf.bneq)
         {
+            control_instructions++;
             // buf.writeToRegister = false;
             //compare with 0
             int val1 = idexBuf.destval;
@@ -165,25 +174,39 @@ EMBuffer EXModule::execute()
                 
                 //set pc new value
                 pc.write(val);
+            //generate go flush signal
+            FLUSH = true;
+            control_stalls += 2;
+            total_stalls += 2;
+            buf.invalid = true;
+            ready = true;
+            return buf;
 
             }
             else
             {
                 //keep same pc value;
-                pc.write(idexBuf.npc);
+                //pc.write(idexBuf.npc);
+                buf.invalid = true;
+                ready = true;
+                return buf;
             }
 
-            //generate go flush signal
-            FLUSH = true;
-            buf.invalid = true;
-            ready = true;
-            return buf;
+            // //generate go flush signal
+            // FLUSH = true;
+            // control_stalls += 2;
+            // total_stalls += 2;
+            // buf.invalid = true;
+            // ready = true;
+            // return buf;
         }
     else if (idexBuf.HALT_SIGNAL)
         {
+            halt_instructions++;
             buf.HALT_SIGNAL = true;
             buf.invalid = false;
             ready = false;
+            idexBuf.invalid = true;
             return buf;
         }
     buf.invalid = false;

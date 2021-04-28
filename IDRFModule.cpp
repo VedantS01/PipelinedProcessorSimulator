@@ -104,6 +104,8 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[destA] || rf.isWriting[src1A])
             {
+                total_stalls++;
+                data_stalls++;
                 buf.invalid = true;
                 ready = false;
                 return buf;
@@ -121,6 +123,8 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
+                total_stalls++;
+                data_stalls++;
                 buf.invalid = true;
                 ready = false;
                 return buf;
@@ -155,6 +159,8 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A])
             {
+                total_stalls++;
+                data_stalls++;
                 buf.invalid = true;
                 ready = false;
                 return buf;
@@ -191,6 +197,8 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A] || rf.isWriting[destA])
             {
+                total_stalls++;
+                data_stalls++;
                 buf.invalid = true;
                 ready = false;
                 return buf;
@@ -243,6 +251,8 @@ IDEXBuffer IDRFModule::execute()
             rf.reset();
             if(rf.isWriting[destA])
             {
+                total_stalls++;
+                data_stalls++;
                 buf.invalid = true;
                 ready = false;
                 return buf;
@@ -268,6 +278,7 @@ IDEXBuffer IDRFModule::execute()
         buf.HALT_SIGNAL = true;
         buf.invalid = false;
         ready = false;
+        ifidBuf.invalid = true;
         return buf;
     }
     buf.invalid = false;
