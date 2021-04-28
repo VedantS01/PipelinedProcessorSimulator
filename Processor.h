@@ -107,9 +107,6 @@ public:
     //whether the contents of his buffer matter
     flag invalid;
 
-    //redundant
-    flag ready;
-
     //setter; redundant
     void set(int, int);
 
@@ -127,10 +124,9 @@ class IFModule
 {
 public: //in deveopement phase, let's keep everything public. We can introduce data hidinglater on.
     PC &pc;
-    flag *stall;
-    IFModule(PC &_pc, ICache &_I$, flag _stall[5]) : pc(_pc), I$(_I$)
+    IFModule(PC &_pc, ICache &_I$) : pc(_pc), I$(_I$)
     {
-        stall = _stall;
+        stall = false;
         ready = true;
     }
     IFIDBuffer execute(/* args */);
@@ -139,7 +135,8 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
 
     //a go signal to this module
     flag go;
-    flag ready; //reduntant as of yet
+    flag ready; //redundant as of yet
+    flag stall;
 };
 
 class IDEXBuffer
@@ -147,9 +144,6 @@ class IDEXBuffer
 public:
     //whether contents matter
     flag invalid;
-
-    //redundant
-    flag ready;
 
     //operation is arithmetic
     flag arithmetic;
@@ -208,11 +202,11 @@ public:
 class IDRFModule
 {
 public:
-    IDRFModule(RegisterFile &_rf, DCache &_D$, flag _stall[5]) : rf(_rf), D$(_D$), stall(_stall)
+    IDRFModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$)
     {
+        stall = false;
         ready = true;
     }
-    flag *stall;
     RegisterFile &rf;
     DCache &D$;
     IFIDBuffer ifidBuf;
@@ -221,6 +215,7 @@ public:
     
     //status flag
     flag ready;
+    flag stall;
 };
 
 /*
@@ -236,7 +231,6 @@ class EMBuffer
 {
 public:
     flag invalid;
-    flag ready;
     flag HALT_SIGNAL;
 
     int aluOutput;
@@ -272,11 +266,11 @@ public:
     ALU &alu;
     PC &pc;
     flag &FLUSH;
-    flag *stall;
-    EXModule(ALU &_alu, flag _stall[5], PC &_pc, flag &f) : alu(_alu), stall(_stall), pc(_pc), FLUSH(f)
+    EXModule(ALU &_alu, PC &_pc, flag &f) : alu(_alu), pc(_pc), FLUSH(f)
     {
         inc.write(1);
         ready = true;
+        stall = false;
     }
     IDEXBuffer idexBuf;
     Register inc;
@@ -284,6 +278,7 @@ public:
     
     //status flag(s)
     flag ready;
+    flag stall;
 };
 
 class MWBuffer
@@ -304,18 +299,17 @@ public:
     int npc; 
 
     flag invalid;
-    flag ready;
     MWBuffer();
 };
 
 class MEMModule
 {
 public:
-    MEMModule(DCache &_D$, flag _stall[5]) : D$(_D$), stall(_stall)
+    MEMModule(DCache &_D$) : D$(_D$)
     {
+        stall = false;
         ready = true;
     }
-    flag *stall;
 
     DCache &D$;
     EMBuffer emBuf;
@@ -324,6 +318,7 @@ public:
 
     //status flag(s)
     flag ready;
+    flag stall;
 };
 
 class WBSTATUS {
@@ -342,18 +337,18 @@ public:
     MWBuffer mwBuf;
     RegisterFile &rf;
     DCache &D$;
-    WBModule(RegisterFile &_rf, DCache &_D$, flag _stall[5]) : rf(_rf), D$(_D$)
+    WBModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$)
     {
-        stall = _stall;
+        stall = false;
         ready = true;
     }
-    flag *stall;
 
     //ICache &I$;
     WBSTATUS execute(/* args */);
 
     //status flag(s)
     flag ready;
+    flag stall;
 };
 
 class ControlUnit
@@ -394,7 +389,7 @@ public:
     //more data
 
     //methods
-    Processor() : IF(pc, I$, stall), IDRF(rf, D$, stall), EX(alu, stall, pc, FLUSH), MEM(D$, stall), WB(rf, D$, stall) {}
+    Processor() : IF(pc, I$), IDRF(rf, D$), EX(alu, pc, FLUSH), MEM(D$), WB(rf, D$) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();

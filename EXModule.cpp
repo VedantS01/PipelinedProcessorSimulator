@@ -16,7 +16,6 @@ EMBuffer EXModule::execute()
 {
     EMBuffer buf;
     buf.invalid = true;
-    buf.ready = true;
     if(idexBuf.invalid) {
         ready = true;
         buf.invalid = true;
@@ -188,7 +187,6 @@ EMBuffer EXModule::execute()
             return buf;
         }
     buf.invalid = false;
-    buf.ready = true;
     ready = true;
     return buf;
 }

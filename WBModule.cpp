@@ -37,6 +37,7 @@ WBSTATUS WBModule::execute()
         }
         */
         rf.isWriting[mwBuf.dest] = false;
+        cout << "Written " << mwBuf.destval << " on reg " << mwBuf.dest << endl;
     }
     else if (mwBuf.load)
     {

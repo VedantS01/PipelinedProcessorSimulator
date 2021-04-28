@@ -86,6 +86,7 @@ void Processor::startup()
     {
         cycle();
     }
+    cout << "Number of clock cycles taken = " << clock_cycle << endl;
 
     output();
     
@@ -105,37 +106,60 @@ void Processor::cycle()
     {
         IFID = IF.execute();
     }
-    if (!IDRF.ifidBuf.invalid)
+    if (!IDRF.stall)
     {
         IDEX = IDRF.execute();
     }
-    if (!EX.idexBuf.invalid)
+    if (!EX.stall)
     {
         EM = EX.execute();
     }
-    if (!MEM.emBuf.invalid)
+    if (!MEM.stall)
     {
         MW = MEM.execute();
     }
-    if (!WB.mwBuf.invalid)
+    if (!WB.stall)
     {
         wbstatus = WB.execute();
     }
     rf.reset();
 
+    if(FLUSH) {
+        //render last 2 computations useless
+        IF.go = true;
+        IDRF.ready = true;
+        IDRF.stall = false;
+        IFID.invalid = true;
+        IDEX.invalid = true;
+        FLUSH = false;
+    }
     //forward
     if (WB.ready)
     {
         WB.mwBuf = MW;
+        IF.go = true;
+        IF.stall = false;
+        IDRF.stall = false;
+        EX.stall = false;
+        MEM.stall = false;
         if (MEM.ready)
         {
             MEM.emBuf = EM;
+            IF.go = true;
+            IF.stall = false;
+            IDRF.stall = false;
+            EX.stall = false;
             if (EX.ready)
             {
                 EX.idexBuf = IDEX;
+                IF.go = true;
+                IF.stall = false;
+                IDRF.stall = false;
                 if (IDRF.ready)
                 {
                     IDRF.ifidBuf = IFID;
+                    IF.go = true;
+                    IF.stall = false;
                     if (IF.ready) 
                     {
                         IF.go = true;
@@ -150,24 +174,27 @@ void Processor::cycle()
                 {
                     cout << "Blocking-3" << endl;
                     IF.go = false;
-                    IDRF.ifidBuf.ready = false;
+                    IF.stall = true;
+                    //IDRF.ifidBuf.ready = false;
                 }
             }
             else
             {
                 cout << "Blocking-2" << endl;
                 IF.go = false;
-                IDRF.ifidBuf.ready = false;
-                EX.idexBuf.ready = false;
+                IF.stall = true;
+                IDRF.stall = true;
+                //EX.idexBuf.ready = false;
             }
         }
         else
         {
             cout << "Blocking-1" << endl;
             IF.go = false;
-            IDRF.ifidBuf.ready = false;
-            EX.idexBuf.ready = false;
-            MEM.emBuf.ready = false;
+            IF.stall = true;
+            IDRF.stall = true;
+            EX.stall = true;
+            // MEM.emBuf.ready = false;
             // IDRF.ifidBuf.ready = false;
         }
     }
@@ -175,20 +202,15 @@ void Processor::cycle()
     {
         cout << "Blocking" << endl;
         IF.go = false;
-        IDRF.ifidBuf.ready = false;
-        EX.idexBuf.ready = false;
-        MEM.emBuf.ready = false;
+        IF.stall = true;
+        IDRF.stall = true;
+        EX.stall = true;
+        MEM.stall = true;
         // IDRF.ifidBuf.ready = false;
-        WB.mwBuf.ready = false;
-        COMPLETE = true;
+        // WB.mwBuf.ready = false;
+        COMPLETE = true; //?
     }
-    if(FLUSH) {
-        IF.go = true;
-        IDRF.ready = true;
-        IDRF.ifidBuf.invalid = true;
-        EX.idexBuf.invalid = true;
-        FLUSH = false;
-    }
+    
 }
 
 void Processor::testicache()

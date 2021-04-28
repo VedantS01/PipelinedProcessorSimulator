@@ -18,9 +18,6 @@ IDEXBuffer::IDEXBuffer()
     //whether contents matter
     invalid = true;
 
-    //redundant
-    ready = true;
-
     //operation is arithmetic
     arithmetic = false;
 

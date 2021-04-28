@@ -16,7 +16,6 @@ using namespace std;
 EMBuffer::EMBuffer()
 {
     invalid = true;
-    ready = true;
 
     HALT_SIGNAL = false;
 

@@ -29,7 +29,6 @@ IFIDBuffer IFModule::execute() {
     buf.set(pc.val, instruction);
     cout << "IF:" << pc.val << endl;
     buf.invalid = false;
-    buf.ready = true;
     ready = true;
     return buf;
 }

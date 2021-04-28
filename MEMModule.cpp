@@ -19,7 +19,6 @@ MWBuffer MEMModule::execute()
     if (emBuf.invalid)
     {
         buf.invalid = true;
-        buf.ready = true;
         ready = true;
         return buf;
     }
@@ -43,7 +42,7 @@ MWBuffer MEMModule::execute()
         buf.load = false;
         buf.aluInstr = false;
         //here, emBuf.aluOut is m address and emBuf.dest is register contents
-        D$.write(emBuf.aluOutput, emBuf.dest);
+        D$.write(emBuf.aluOutput, emBuf.destval);
     }
     else if(emBuf.writeToRegister)
     {
@@ -66,7 +65,6 @@ MWBuffer MEMModule::execute()
         cerr << "Can't reach here, logical error.\n";
     }
     buf.invalid = false;
-    buf.ready = true;
     ready = true;
     return buf;
 }
