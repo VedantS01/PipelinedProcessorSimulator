@@ -137,8 +137,13 @@ EMBuffer EXModule::execute()
             buf.aluOutput = val;
 
             //set pc new value
+            pc.write(val);
 
+            //generate go flush signal
+            FLUSH = true;
             buf.invalid = true;
+            ready = true;
+            return buf;
         }
     else if(idexBuf.bneq)
         {
@@ -154,12 +159,21 @@ EMBuffer EXModule::execute()
                 buf.aluOutput = val;
                 
                 //set pc new value
+                pc.write(val);
 
-                buf.invalid = true;
+            }
+            else
+            {
+                //keep same pc value;
+                pc.write(idexBuf.npc);
+                pc.increment();
             }
 
-            //keep same pc value;
-
+            //generate go flush signal
+            FLUSH = true;
+            buf.invalid = true;
+            ready = true;
+            return buf;
         }
     else if (idexBuf.HALT_SIGNAL)
         {

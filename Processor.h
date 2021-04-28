@@ -270,8 +270,10 @@ class EXModule
 {
 public:
     ALU &alu;
+    PC &pc;
+    flag &FLUSH;
     flag *stall;
-    EXModule(ALU &_alu, flag _stall[5]) : alu(_alu), stall(_stall)
+    EXModule(ALU &_alu, flag _stall[5], PC &_pc, flag &f) : alu(_alu), stall(_stall), pc(_pc), FLUSH(f)
     {
         inc.write(1);
         ready = true;
@@ -383,6 +385,7 @@ public:
     ALU alu;
     flag HALT_SIGNAL;
     flag COMPLETE;
+    flag FLUSH;
     int clock_cycle;
 
     flag stall[5];
@@ -391,7 +394,7 @@ public:
     //more data
 
     //methods
-    Processor() : IF(pc, I$, stall), IDRF(rf, D$, stall), EX(alu, stall), MEM(D$, stall), WB(rf, D$, stall) {}
+    Processor() : IF(pc, I$, stall), IDRF(rf, D$, stall), EX(alu, stall, pc, FLUSH), MEM(D$, stall), WB(rf, D$, stall) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();

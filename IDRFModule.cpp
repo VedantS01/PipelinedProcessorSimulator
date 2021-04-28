@@ -71,8 +71,8 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
                 ready = false;
@@ -110,8 +110,8 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[destA] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
                 ready = false;
@@ -130,8 +130,8 @@ IDEXBuffer IDRFModule::execute()
         {
             if (rf.isWriting[src2A] || rf.isWriting[src1A])
             {
-                stall[0] = true;
-                stall[1] = true;
+                // stall[0] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
                 ready = false;
@@ -167,9 +167,9 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A])
             {
-                stall[0] = true;
+                // stall[0] = true;
 
-                stall[1] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
                 ready = false;
@@ -207,9 +207,9 @@ IDEXBuffer IDRFModule::execute()
             int src2A = instruction & 0xf;
             if (rf.isWriting[src1A] || rf.isWriting[destA])
             {
-                stall[0] = true;
+                // stall[0] = true;
 
-                stall[1] = true;
+                // stall[1] = true;
                 buf.invalid = true;
                 buf.ready = false;
                 ready = false;
@@ -241,9 +241,14 @@ IDEXBuffer IDRFModule::execute()
             buf.load = false;
             buf.jump = true;
             buf.bneq = false;
-            stall[0] = true;
-            stall[1] = true;
+            // stall[0] = true;
+            // stall[1] = true;
             //branch issues;
+
+            ready = false;
+            buf.invalid = false;
+            return buf;
+            // BRANCH = 2;
         }
         else
         {
@@ -262,8 +267,13 @@ IDEXBuffer IDRFModule::execute()
             buf.dest = destA;
             buf.destval = dest;
             buf.validdest = true;
-            stall[0] = true;
-            stall[1] = true;
+            // stall[0] = true;
+            // stall[1] = true;
+
+            ready = false;
+            buf.invalid = false;
+            return buf;
+            // BRANCH = 2;
         }
     }
     else if (mode == 3)

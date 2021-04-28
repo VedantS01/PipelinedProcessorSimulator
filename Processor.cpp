@@ -77,6 +77,7 @@ void Processor::startup()
     pc.val = 0;
     HALT_SIGNAL = false;
     COMPLETE = false;
+    FLUSH = false;
     clock_cycle = 0;
     IF.go = true;
     wbstatus.invalid = true;
@@ -181,14 +182,12 @@ void Processor::cycle()
         WB.mwBuf.ready = false;
         COMPLETE = true;
     }
-    /*             
-    if (clock_cycle == 10)
-    {
-        HALT_SIGNAL = true;
-        COMPLETE = true;
+    if(FLUSH) {
+        IF.go = true;
+        IDRF.ready = true;
+        //IFID.invalid = true;
+        FLUSH = false;
     }
-    */
-//pc.increment();
 }
 
 void Processor::testicache()
