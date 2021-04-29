@@ -90,10 +90,7 @@ void Processor::cycle()
 {
     // processor clock cycle
     clock_cycle++;
-
-    int flag1 = 0;
-
-
+    
     if (!WB.stall)
     {
         wbstatus = WB.execute();

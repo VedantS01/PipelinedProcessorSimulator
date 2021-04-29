@@ -19,13 +19,7 @@ MWBuffer::MWBuffer()
     load = false;
     aluInstr = false;
 
-    dest;
-    destval;
     validdest = false;
-
-    val;
-
-    lmd;
 
     npc = -1;
 }

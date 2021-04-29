@@ -23,7 +23,6 @@ EMBuffer EXModule::execute()
 
     buf.npc = idexBuf.npc;
     total_instructions++;
-    cout << "EX: " << idexBuf.npc << endl;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
@@ -73,29 +72,29 @@ EMBuffer EXModule::execute()
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
             //xor
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
-            int val = alu.XOR(val1, val2);
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
+            val = alu.XOR(val1, val2);
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
             //not
-            int val1 = idexBuf.srcval1;
-            int val = alu.NOT(val1);
+            val1 = idexBuf.srcval1;
+            val = alu.NOT(val1);
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
             //or
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
-            int val = alu.OR(val1, val2);
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
+            val = alu.OR(val1, val2);
         }
         else //subop=0
         {
             //and
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.srcval2;
-            int val = alu.AND(val1, val2);
+            val1 = idexBuf.srcval1;
+            val2 = idexBuf.srcval2;
+            val = alu.AND(val1, val2);
         }
         buf.writeToRegister = true;
         buf.dest = idexBuf.dest;
