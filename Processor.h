@@ -28,6 +28,7 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
+//NOTE: set this to enable operand forwarding
 #define ENABLE_OPEARND_FORWARDING false
 
 //global variables for the processor
