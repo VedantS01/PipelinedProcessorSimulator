@@ -93,6 +93,11 @@ void Processor::cycle()
 
     int flag1 = 0;
 
+
+    if (!WB.stall)
+    {
+        wbstatus = WB.execute();
+    }
     if (IF.go)
     {
         IFID = IF.execute();
@@ -108,10 +113,6 @@ void Processor::cycle()
     if (!MEM.stall)
     {
         MW = MEM.execute();
-    }
-    if (!WB.stall)
-    {
-        wbstatus = WB.execute();
     }
     rf.reset();
 

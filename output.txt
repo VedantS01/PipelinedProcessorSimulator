@@ -5,7 +5,7 @@ Logical instructions                 : 0
 Data instructions                    : 10
 Control instructions                 : 19
 Halt instructions                    : 1
-Cycles Per Instrcution               : 2.21569
-Total number of stalls               : 58
-Data stalls (raw)                    : 20
+Cycles Per Instrcution               : 2.60784
+Total number of stalls               : 78
+Data stalls (raw)                    : 40
 Control stalls                       : 38
