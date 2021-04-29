@@ -69,10 +69,6 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
 
 void Processor::startup()
 {
-    for (int i = 0; i < 5; i++)
-    {
-        stall[i] = false;
-    }
     pc.val = 0;
     HALT_SIGNAL = false;
     COMPLETE = false;

@@ -28,6 +28,8 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
+#define ENABLE_OPEARND_FORWARDING false
+
 //global variables for the processor
 extern int total_instructions;
 extern int arithmetic_instructions;
@@ -110,6 +112,8 @@ public:
     int request(int);
     void write(int, int);
 };
+
+class ForwardingUnit;
 
 class IFIDBuffer
 {
@@ -218,13 +222,14 @@ public:
 class IDRFModule
 {
 public:
-    IDRFModule(RegisterFile &_rf, DCache &_D$) : rf(_rf), D$(_D$)
+    IDRFModule(RegisterFile &_rf, DCache &_D$, ForwardingUnit &_FU) : rf(_rf), D$(_D$), FU(_FU)
     {
         stall = false;
         ready = true;
     }
     RegisterFile &rf;
     DCache &D$;
+    ForwardingUnit &FU;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */);
     flag resolveBranch(int);
@@ -367,14 +372,34 @@ public:
     flag stall;
 };
 
-class ControlUnit
+//register forwarding unit
+/**
+ * REGISTER FOWARDING UNIT
+ * VERSION 1.0
+ * AUTHOR : VEDANT SABOO, CS19B074
+ **/
+class ForwardingUnit
 {
+    public:
+    IFIDBuffer &IFID;
+    IDEXBuffer &IDEX;
+    EMBuffer &EM;
+    MWBuffer &MW;
+
+    flag request_success;
+    int request(int);
+    ForwardingUnit(IFIDBuffer &ifid, IDEXBuffer& idex, EMBuffer &em, MWBuffer &mw) : IFID(ifid), IDEX(idex), EM(em), MW(mw)
+    {
+        request_success = false;
+    }
 };
+/**
+ * END
+ **/
 
 class Processor
 {
 public:
-    //ControlUnit CU;
     ICache I$;
     DCache D$;
     RegisterFile rf;
@@ -399,13 +424,11 @@ public:
     flag FLUSH;
     int clock_cycle;
 
-    flag stall[5];
-    //more
-
-    //more data
+    //register forwarding unit
+    ForwardingUnit FU;
 
     //methods
-    Processor() : IF(pc, I$), IDRF(rf, D$), EX(alu, pc, FLUSH), MEM(D$), WB(rf, D$) {}
+    Processor() : IF(pc, I$),FU(IFID, IDEX, EM, MW), IDRF(rf, D$, FU), EX(alu, pc, FLUSH), MEM(D$), WB(rf, D$) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();
