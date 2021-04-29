@@ -211,10 +211,10 @@ void Processor::output()
     fout.open("D$.out.txt");
     for (int i = 0; i < NUMSETS; i++)
     {
-        fout << hex << D$.data[i].offset[0] << D$.data[i].offset[1] << endl;
-        // fout << hex << D$.data[i].offset[1] << endl;
-        fout << hex << D$.data[i].offset[2] << D$.data[i].offset[3] << endl;
-        // fout << hex << D$.data[i].offset[3] << endl;
+        fout << std::hex << std::setw(2) << std::setfill('0') << D$.data[i].offset[0] << endl;
+        fout << std::hex << std::setw(2) << std::setfill('0') << D$.data[i].offset[1] << endl;
+        fout << std::hex << std::setw(2) << std::setfill('0') << D$.data[i].offset[2] << endl;
+        fout << std::hex << std::setw(2) << std::setfill('0') << D$.data[i].offset[3] << endl;
     }
     fout.close();
 
