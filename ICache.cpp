@@ -11,14 +11,17 @@
 #include <iostream>
 using namespace std;
 
-int ICache::request(int addr) {
+int ICache::request(int addr)
+{
     int set = addr >> 2;
     int offset = addr & 3;
     int little = data[set].offset[offset];
-    if(offset == 3) {
+    if (offset == 3)
+    {
         offset = 0;
         set++;
-        if(set >= 64) {
+        if (set >= 64)
+        {
             set = 0;
         }
     }
@@ -29,9 +32,9 @@ int ICache::request(int addr) {
     return ret;
 }
 
-void ICache::write(int addr, int item) {
-    int set = addr >> 2;
-    int offset = addr & 3;
-    data[set].offset[offset] = item >> 8;
-    data[set].offset[offset] = item & 0xff;
-}
+// void ICache::write(int addr, int item) {
+//     int set = addr >> 2;
+//     int offset = addr & 3;
+//     data[set].offset[offset] = item >> 8;
+//     data[set].offset[offset] = item & 0xff;
+// }

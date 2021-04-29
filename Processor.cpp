@@ -64,7 +64,6 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
     total_stalls = 0;
     data_stalls = 0;
     control_stalls = 0;
-
 }
 
 void Processor::startup()
@@ -77,20 +76,19 @@ void Processor::startup()
     IF.go = true;
     wbstatus.invalid = true;
     wbstatus.ready = true;
-    while (! COMPLETE)
+    while (!COMPLETE)
     {
         cycle();
     }
 
     output();
-    
 }
 
 void Processor::cycle()
 {
     // processor clock cycle
     clock_cycle++;
-    
+
     if (!WB.stall)
     {
         wbstatus = WB.execute();
@@ -113,7 +111,8 @@ void Processor::cycle()
     }
     rf.reset();
 
-    if(FLUSH) {
+    if (FLUSH)
+    {
         //render last 2 computations useless
         IF.go = true;
         IDRF.ready = true;
@@ -149,7 +148,7 @@ void Processor::cycle()
                     IDRF.ifidBuf = IFID;
                     IF.go = true;
                     IF.stall = false;
-                    if (IF.ready) 
+                    if (IF.ready)
                     {
                         IF.go = true;
                     }
@@ -194,31 +193,33 @@ void Processor::cycle()
         // WB.mwBuf.ready = false;
         COMPLETE = true; //?
     }
-    
 }
 
-void Processor::output() {
+void Processor::output()
+{
     ofstream fout;
-    
+
     //rf
     fout.open("RF.out.txt");
-    for(int i = 0; i < NUM_REGS; i++) {
+    for (int i = 0; i < NUM_REGS; i++)
+    {
         fout << hex << rf.R[i].read() << endl;
     }
     fout.close();
 
     //D$
     fout.open("D$.out.txt");
-    for(int i = 0; i < NUMSETS; i++) {
-        fout << hex << D$.data[i].offset[0] << endl;
-        fout << hex << D$.data[i].offset[1] << endl;
-        fout << hex << D$.data[i].offset[2] << endl;
-        fout << hex << D$.data[i].offset[3] << endl;
+    for (int i = 0; i < NUMSETS; i++)
+    {
+        fout << hex << D$.data[i].offset[0] << D$.data[i].offset[1] << endl;
+        // fout << hex << D$.data[i].offset[1] << endl;
+        fout << hex << D$.data[i].offset[2] << D$.data[i].offset[3] << endl;
+        // fout << hex << D$.data[i].offset[3] << endl;
     }
     fout.close();
 
     //processing data
-    cpi = (float) clock_cycle/total_instructions ;
+    cpi = (float)clock_cycle / total_instructions;
     fout.open("Output.txt");
     fout << "Total number of instructions executed: " << std::dec << total_instructions << endl;
     fout << "Number of instrcutions in each class" << endl;
