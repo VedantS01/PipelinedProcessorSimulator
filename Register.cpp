@@ -67,7 +67,7 @@ RegisterFile::RegisterFile()
 {
     for (int i = 0; i < 16; i++)
     {
-        isWriting[i] = false;
+        isWriting[i] = 0;
     }
     request_failed = false;
     fread1 = fread2 = fwrite = false;

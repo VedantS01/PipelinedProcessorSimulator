@@ -23,13 +23,27 @@ WBSTATUS WBModule::execute()
     }
     if (mwBuf.aluInstr)
     {
-        rf.write(mwBuf.dest, mwBuf.destval);
-        rf.isWriting[mwBuf.dest] = false;
+        if(rf.isWriting[mwBuf.dest] == 0)
+        {
+            cout << "rf error" << endl;
+        }
+        if(rf.isWriting[mwBuf.dest] == 1)
+        {
+            rf.write(mwBuf.dest, mwBuf.destval);
+        }
+        rf.isWriting[mwBuf.dest]--;
     }
     else if (mwBuf.load)
     {
-        rf.write(mwBuf.dest, mwBuf.lmd);
-        rf.isWriting[mwBuf.dest] = false;
+        if(rf.isWriting[mwBuf.dest] == 0)
+        {
+            cout << "rf error" << endl;
+        }
+        if(rf.isWriting[mwBuf.dest] == 1)
+        {
+            rf.write(mwBuf.dest, mwBuf.lmd);
+        }
+        rf.isWriting[mwBuf.dest]--;
     }
     else if (mwBuf.HALT_SIGNAL)
     {

@@ -48,7 +48,7 @@ IDEXBuffer IDRFModule::execute()
         int src2A = instruction & 0xf;
         if (subop == 3)
         {
-            if (rf.isWriting[destA])
+            if (rf.isWriting[destA] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -85,10 +85,12 @@ IDEXBuffer IDRFModule::execute()
 
             buf.dest = destA;
             buf.validdest = false; //it will overwritten
+
+            FU.renderInvalidIfValid(destA);
         }
         else
         {
-            if (rf.isWriting[src2A])
+            if (rf.isWriting[src2A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -158,9 +160,20 @@ IDEXBuffer IDRFModule::execute()
 
             buf.dest = destA;
             buf.validdest = false;
+
+            if(src1A == destA)
+            {
+                buf.validsrc1 = false;
+            }
+            if(src2A == destA)
+            {
+                buf.validsrc2 = false;
+            }
+            
+            FU.renderInvalidIfValid(destA);
         }
 
-        rf.isWriting[destA] = true;
+        rf.isWriting[destA] ++;
     }
     else if (mode == 1)
     {
@@ -178,7 +191,7 @@ IDEXBuffer IDRFModule::execute()
         int src2A = instruction & 0xf;
         if (subop == 2)
         {
-            if (rf.isWriting[src1A])
+            if (rf.isWriting[src1A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -210,16 +223,23 @@ IDEXBuffer IDRFModule::execute()
                 buf.srcval1 = rf.read(src1A);
             }
             buf.src1 = src1A;
-            buf.validsrc1 = true;
+            buf.validsrc1 = false;
 
             buf.validsrc2 = false;
 
             buf.dest = destA;
             buf.validdest = false;
+            
+            if(src1A == destA)
+            {
+                buf.validsrc1 = false;
+            }
+
+            // FU.renderInvalidIfValid(destA);
         }
         else
         {
-            if (rf.isWriting[src2A])
+            if (rf.isWriting[src2A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -250,7 +270,7 @@ IDEXBuffer IDRFModule::execute()
             {
                 buf.srcval2 = rf.read(src2A);
             }
-            if (rf.isWriting[src1A])
+            if (rf.isWriting[src1A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -282,15 +302,26 @@ IDEXBuffer IDRFModule::execute()
                 buf.srcval1 = rf.read(src1A);
             }
             buf.src1 = src1A;
-            buf.validsrc1 = true;
+            buf.validsrc1 = false;
 
             buf.src2 = src2A;
-            buf.validsrc2 = true;
+            buf.validsrc2 = false;
 
             buf.dest = destA;
             buf.validdest = false;
+            
+            if(src1A == destA)
+            {
+                buf.validsrc1 = false;
+            }
+            if(src2A == destA)
+            {
+                buf.validsrc2 = false;
+            }
+            
+            // FU.renderInvalidIfValid(destA);
         }
-        rf.isWriting[destA] = true;
+        rf.isWriting[destA]++;
     }
     else if (mode == 2)
     {
@@ -307,7 +338,7 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             int src1A = (instruction >> 4) & 0xf;
             int src2A = instruction & 0xf;
-            if (rf.isWriting[src1A])
+            if (rf.isWriting[src1A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -340,7 +371,7 @@ IDEXBuffer IDRFModule::execute()
             }
             //base register
             buf.src1 = src1A;
-            buf.validsrc1 = true;
+            buf.validsrc1 = false;
 
             //src2 is invalid
             buf.validsrc2 = false;
@@ -348,7 +379,15 @@ IDEXBuffer IDRFModule::execute()
             //load will write in dest
             buf.dest = destA;
             buf.validdest = false;
-            rf.isWriting[destA] = true;
+            
+            if(src1A == destA)
+            {
+                buf.validsrc1 = false;
+            }
+            
+            // FU.renderInvalidIfValid(destA);
+
+            rf.isWriting[destA]++;
 
             //offset will be given in src2A
             int s = src2A >> 3;
@@ -367,7 +406,7 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             int src1A = (instruction >> 4) & 0xf;
             int src2A = instruction & 0xf;
-            if (rf.isWriting[destA])
+            if (rf.isWriting[destA] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -398,7 +437,7 @@ IDEXBuffer IDRFModule::execute()
             {
                 buf.destval = rf.read(destA);
             }
-            if (rf.isWriting[src1A])
+            if (rf.isWriting[src1A] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -432,15 +471,14 @@ IDEXBuffer IDRFModule::execute()
             
             //base register
             buf.src1 = src1A;
-            buf.srcval1 = rf.read(src1A);
-            buf.validsrc1 = true;
+            buf.validsrc1 = false;
 
             //src2 is invalid
             buf.validsrc2 = false;
 
             //store will read from dest
             buf.dest = destA;
-            buf.validdest = true;
+            buf.validdest = false;
 
             //offset will be given in src2A
             int s = src2A >> 3;
@@ -475,7 +513,7 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             rf.getBusy();
             rf.reset();
-            if (rf.isWriting[destA])
+            if (rf.isWriting[destA] != 0)
             {
                 if(ENABLE_OPEARND_FORWARDING)
                 {
@@ -508,7 +546,7 @@ IDEXBuffer IDRFModule::execute()
             }
             
             buf.dest = destA;
-            buf.validdest = true;
+            buf.validdest = false;
 
         }
     }

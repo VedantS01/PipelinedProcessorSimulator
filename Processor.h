@@ -28,7 +28,7 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
-#define ENABLE_OPEARND_FORWARDING false
+#define ENABLE_OPEARND_FORWARDING true
 
 //global variables for the processor
 extern int total_instructions;
@@ -71,7 +71,7 @@ class RegisterFile
 {
 public:
     flag request_failed;
-    flag isWriting[16];
+    int isWriting[NUM_REGS];
     Register R[NUM_REGS];
     flag fread1;
     flag fread2;
@@ -388,6 +388,7 @@ class ForwardingUnit
 
     flag request_success;
     int request(int);
+    void renderInvalidIfValid(int);
     ForwardingUnit(IFIDBuffer &ifid, IDEXBuffer& idex, EMBuffer &em, MWBuffer &mw) : IFID(ifid), IDEX(idex), EM(em), MW(mw)
     {
         request_success = false;

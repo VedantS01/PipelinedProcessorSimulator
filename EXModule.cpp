@@ -23,6 +23,7 @@ EMBuffer EXModule::execute()
 
     buf.npc = idexBuf.npc;
     total_instructions++;
+    cout << "EX: " << idexBuf.npc << endl;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
@@ -168,24 +169,6 @@ EMBuffer EXModule::execute()
                 
                 //set pc new value
                 pc.write(val);
-            //generate go flush signal
-            FLUSH = true;
-            control_stalls += 2;
-            total_stalls += 2;
-            buf.invalid = true;
-            ready = true;
-            return buf;
-
-            }
-            else
-            {
-                //keep same pc value;
-                //pc.write(idexBuf.npc);
-                buf.invalid = true;
-                ready = true;
-                return buf;
-            }
-
             // //generate go flush signal
             // FLUSH = true;
             // control_stalls += 2;
@@ -193,6 +176,24 @@ EMBuffer EXModule::execute()
             // buf.invalid = true;
             // ready = true;
             // return buf;
+
+            }
+            else
+            {
+                //keep same pc value;
+                pc.write(idexBuf.npc);
+                // buf.invalid = true;
+                // ready = true;
+                // return buf;
+            }
+
+            //generate go flush signal
+            FLUSH = true;
+            control_stalls += 2;
+            total_stalls += 2;
+            buf.invalid = true;
+            ready = true;
+            return buf;
         }
     else if (idexBuf.HALT_SIGNAL)
         {
