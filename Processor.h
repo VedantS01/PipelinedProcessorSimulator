@@ -28,8 +28,8 @@ using namespace std;
 #define NUMSETS 64
 #define BLOCK_SIZE 4
 
-//NOTE: set this to enable operand forwarding
-#define ENABLE_OPEARND_FORWARDING false
+//NOTE: set this to enable operand forwarding, reset to disable
+#define ENABLE_OPEARND_FORWARDING true
 
 //global variables for the processor
 extern int total_instructions;
