@@ -43,12 +43,14 @@ extern int total_stalls;
 extern int data_stalls;
 extern int control_stalls;
 
+extern int RENAME;
+
 class Register
 {
 public:
     int val;
     int read();
-    void write(int _val); //_val is well inside 8 s
+    void write(int _val); //_val is well inside 8 bits
 };
 
 class Register16
@@ -56,7 +58,7 @@ class Register16
 public:
     int val;
     int read();
-    void write(int _val); //_val is well inside 8 s
+    void write(int _val); //_val is well inside 16 bits
 };
 
 class PC
@@ -160,6 +162,13 @@ public: //in deveopement phase, let's keep everything public. We can introduce d
     flag stall;
 };
 
+class RS {
+    public:
+    int tag;
+    int valid;
+    int data;
+};
+
 class IDEXBuffer
 {
 public:
@@ -195,21 +204,27 @@ public:
 
     //in case of arithmetic and logic instructions, this is first operand
     //in case of load store, this register is base
-    int src1;
-    int srcval1;
-    flag validsrc1; //will be used in operator forwarding
+    // int src1;
+    // int srcval1;
+    // flag validsrc1; 
+    RS src1;
+    //will be used in operator forwarding
 
     //in case of arithmetic and logic instructions, this is second operand
     //in case of load store, src2 and srcval2 are not valid
-    int src2;
-    int srcval2;
-    flag validsrc2; //will be used in operator forwarding
+    // int src2;
+    // int srcval2;
+    // flag validsrc2; 
+    RS src2;
+    //will be used in operator forwarding
 
     //will denote write_to register in arithmetic and logic operations and load instruction
-    int dest;
-    //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
-    int destval;
-    int validdest; //will be used in operator forwarding
+    // int dest;
+    // //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
+    // int destval;
+    // int validdest; 
+    RS dest;
+    //will be used in operator forwarding
 
     //in load store, offset stores the immediate 4  value of address offset
     int offset;
@@ -233,21 +248,13 @@ public:
     ForwardingUnit &FU;
     IFIDBuffer ifidBuf;
     IDEXBuffer execute(/* args */);
+    RS registerFetch(int tag);
     flag resolveBranch(int);
     
     //status flag
     flag ready;
     flag stall;
 };
-
-/*
-class EXModule
-{
-public:
-    IDEXBuffer idexbuf;
-    EMBuffer execute(IDEXBuffer);
-    
-};*/
 
 class EMBuffer
 {
@@ -287,8 +294,9 @@ class EXModule
 public:
     ALU &alu;
     PC &pc;
+    ForwardingUnit &FU;
     flag &FLUSH;
-    EXModule(ALU &_alu, PC &_pc, flag &f) : alu(_alu), pc(_pc), FLUSH(f)
+    EXModule(ALU &_alu, PC &_pc, ForwardingUnit &_FU, flag &f) : alu(_alu), pc(_pc), FU(_FU), FLUSH(f)
     {
         inc.write(1);
         ready = true;
@@ -430,7 +438,7 @@ public:
     ForwardingUnit FU;
 
     //methods
-    Processor() : IF(pc, I$),FU(IFID, IDEX, EM, MW), IDRF(rf, D$, FU), EX(alu, pc, FLUSH), MEM(D$), WB(rf, D$) {}
+    Processor() : IF(pc, I$),FU(IFID, IDEX, EM, MW), IDRF(rf, D$, FU), EX(alu, pc, FU, FLUSH), MEM(D$), WB(rf, D$) {}
     void setup(ifstream &, ifstream &, ifstream &);
     void startup();
     void cycle();

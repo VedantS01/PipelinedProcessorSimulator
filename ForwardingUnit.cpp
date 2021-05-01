@@ -28,11 +28,11 @@ int ForwardingUnit::request(int tag) {
         //     IDEX.validsrc2 = false; //do not reference from here anymore
         //     return IDEX.srcval2;
         // }
-        if(IDEX.validdest && IDEX.dest == tag) 
+        if(IDEX.dest.valid && IDEX.dest.tag == tag) 
         {
             request_success = true;
-            IDEX.validdest = false; //do not reference from here anymore
-            return IDEX.destval;
+            IDEX.dest.valid = false; //do not reference from here anymore
+            return IDEX.dest.data;
         }
     }
 
@@ -68,17 +68,17 @@ void ForwardingUnit::renderInvalidIfValid(int tag) {
     //check in IDEX
     if(!IDEX.invalid)
     {
-        if(IDEX.validsrc1 && IDEX.src1 == tag) 
+        // if(IDEX.validsrc1 && IDEX.src1 == tag) 
+        // {
+        //     IDEX.validsrc1 = false; //do not reference from here anymore
+        // }
+        // if(IDEX.validsrc2 && IDEX.src2 == tag) 
+        // {
+        //     IDEX.validsrc2 = false; //do not reference from here anymore
+        // }
+        if(IDEX.dest.valid && IDEX.dest.tag == tag) 
         {
-            IDEX.validsrc1 = false; //do not reference from here anymore
-        }
-        if(IDEX.validsrc2 && IDEX.src2 == tag) 
-        {
-            IDEX.validsrc2 = false; //do not reference from here anymore
-        }
-        if(IDEX.validdest && IDEX.dest == tag) 
-        {
-            IDEX.validdest = false; //do not reference from here anymore
+            IDEX.dest.valid = false; //do not reference from here anymore
         }
     }
 

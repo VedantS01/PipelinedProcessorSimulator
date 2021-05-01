@@ -25,6 +25,8 @@ int total_stalls;
 int data_stalls;
 int control_stalls;
 
+int RENAME;
+
 void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
 {
     //read icache values
@@ -64,6 +66,8 @@ void Processor::setup(ifstream &finI, ifstream &finD, ifstream &finR)
     total_stalls = 0;
     data_stalls = 0;
     control_stalls = 0;
+
+    RENAME = NUM_REGS;
 }
 
 void Processor::startup()
@@ -97,13 +101,13 @@ void Processor::cycle()
     {
         IFID = IF.execute();
     }
-    if (!IDRF.stall)
-    {
-        IDEX = IDRF.execute();
-    }
     if (!EX.stall)
     {
         EM = EX.execute();
+    }
+    if (!IDRF.stall)
+    {
+        IDEX = IDRF.execute();
     }
     if (!MEM.stall)
     {

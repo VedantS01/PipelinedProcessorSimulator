@@ -48,25 +48,14 @@ IDEXBuffer IDRFModule::execute()
         int src2A = instruction & 0xf;
         if (subop == 3)
         {
-            if (rf.isWriting[destA] != 0)
+            buf.src1 = registerFetch(destA);
+#ifdef RENAMING
+            buf.src1.tag = RENAME;
+            RENAME++;
+#endif
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(destA);
-                    if(FU.request_success)
-                    {
-                        buf.destval = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.src1.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -75,40 +64,26 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.destval = rf.read(destA);
-            }
-            buf.validsrc1 = false;
-
-            buf.validsrc2 = false;
-
-            buf.dest = destA;
-            buf.validdest = false; //it will overwritten
+            buf.dest.tag = destA;
+            buf.dest.valid = false; //it will overwritten
 
             FU.renderInvalidIfValid(destA);
         }
         else
         {
-            if (rf.isWriting[src2A] != 0)
+            buf.src2 = registerFetch(src2A);
+            buf.src1 = registerFetch(src1A);
+#ifdef RENAMING
+            buf.src1.tag = RENAME;
+            RENAME++;
+#endif
+#ifdef RENAMING
+            buf.src2.tag = RENAME;
+            RENAME++;
+#endif
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src2A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval2 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.src1.valid) || (!buf.src2.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -117,58 +92,18 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.srcval2 = rf.read(src2A);
-            }
-            if (rf.isWriting[src1A])
-            {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src1A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval1 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
-                {
-                    total_stalls++;
-                    data_stalls++;
-                    buf.invalid = true;
-                    ready = false;
-                    return buf;
-                }
-            }
-            else
-            {
-                buf.srcval1 = rf.read(src1A);
-            }
-            buf.src1 = src1A;
-            buf.validsrc1 = true;
 
-            buf.src2 = src2A;
-            buf.validsrc2 = true;
+            buf.dest.tag = destA;
+            buf.dest.valid = false;
 
-            buf.dest = destA;
-            buf.validdest = false;
-
-            if(src1A == destA)
-            {
-                buf.validsrc1 = false;
-            }
-            if(src2A == destA)
-            {
-                buf.validsrc2 = false;
-            }
+            // if(src1A == destA)
+            // {
+            //     buf.src1.valid = false;
+            // }
+            // if(src2A == destA)
+            // {
+            //     buf.src2.valid = false;
+            // }
             
             FU.renderInvalidIfValid(destA);
         }
@@ -189,27 +124,18 @@ IDEXBuffer IDRFModule::execute()
         int destA = (instruction >> 8) & 0xf;
         int src1A = (instruction >> 4) & 0xf;
         int src2A = instruction & 0xf;
+
+        //register fetch
+        //fetch dest
+
+
         if (subop == 2)
         {
-            if (rf.isWriting[src1A] != 0)
+            buf.src1 = registerFetch(src1A);
+
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src1A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval1 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.src1.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -218,46 +144,34 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.srcval1 = rf.read(src1A);
-            }
-            buf.src1 = src1A;
-            buf.validsrc1 = false;
 
-            buf.validsrc2 = false;
+            buf.src2.valid = false;
 
-            buf.dest = destA;
-            buf.validdest = false;
+            buf.dest.tag = destA;
+            buf.dest.valid = false;
             
-            if(src1A == destA)
-            {
-                buf.validsrc1 = false;
-            }
+            // if(src1A == destA)
+            // {
+            //     buf.validsrc1 = false;
+            // }
 
             // FU.renderInvalidIfValid(destA);
         }
         else
         {
-            if (rf.isWriting[src2A] != 0)
+            buf.src2 = registerFetch(src2A);
+            buf.src1 = registerFetch(src1A);
+#ifdef RENAMING
+            buf.src1.tag = RENAME;
+            RENAME++;
+#endif
+#ifdef RENAMING
+            buf.src2.tag = RENAME;
+            RENAME++;
+#endif
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src2A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval2 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.src1.valid) || (!buf.src2.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -266,60 +180,20 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.srcval2 = rf.read(src2A);
-            }
-            if (rf.isWriting[src1A] != 0)
-            {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src1A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval1 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
-                {
-                    total_stalls++;
-                    data_stalls++;
-                    buf.invalid = true;
-                    ready = false;
-                    return buf;
-                }
-            }
-            else
-            {
-                buf.srcval1 = rf.read(src1A);
-            }
-            buf.src1 = src1A;
-            buf.validsrc1 = false;
 
-            buf.src2 = src2A;
-            buf.validsrc2 = false;
+            buf.dest.tag = destA;
+            buf.dest.valid = false;
 
-            buf.dest = destA;
-            buf.validdest = false;
+            // if(src1A == destA)
+            // {
+            //     buf.src1.valid = false;
+            // }
+            // if(src2A == destA)
+            // {
+            //     buf.src2.valid = false;
+            // }
             
-            if(src1A == destA)
-            {
-                buf.validsrc1 = false;
-            }
-            if(src2A == destA)
-            {
-                buf.validsrc2 = false;
-            }
-            
-            // FU.renderInvalidIfValid(destA);
+            FU.renderInvalidIfValid(destA);
         }
         rf.isWriting[destA]++;
     }
@@ -327,6 +201,7 @@ IDEXBuffer IDRFModule::execute()
     {
         if (subop == 0)
         {
+            //load
             buf.logical = false;
             buf.arithmetic = false;
             buf.load = true;
@@ -338,25 +213,12 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             int src1A = (instruction >> 4) & 0xf;
             int src2A = instruction & 0xf;
-            if (rf.isWriting[src1A] != 0)
+            //base register
+            buf.src1 = registerFetch(src1A);
+
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src1A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval1 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.src1.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -365,27 +227,20 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.srcval1 = rf.read(src1A);
-            }
-            //base register
-            buf.src1 = src1A;
-            buf.validsrc1 = false;
 
             //src2 is invalid
-            buf.validsrc2 = false;
+            buf.src2.valid = false;
 
             //load will write in dest
-            buf.dest = destA;
-            buf.validdest = false;
+            buf.dest.tag = destA;
+            buf.dest.valid = false;
             
-            if(src1A == destA)
-            {
-                buf.validsrc1 = false;
-            }
+            // if(src1A == destA)
+            // {
+            //     buf.validsrc1 = false;
+            // }
             
-            // FU.renderInvalidIfValid(destA);
+            FU.renderInvalidIfValid(destA);
 
             rf.isWriting[destA]++;
 
@@ -395,6 +250,7 @@ IDEXBuffer IDRFModule::execute()
         }
         else if (subop == 1)
         {
+            //store
             buf.store = true;
             buf.logical = false;
             buf.arithmetic = false;
@@ -406,79 +262,26 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             int src1A = (instruction >> 4) & 0xf;
             int src2A = instruction & 0xf;
-            if (rf.isWriting[destA] != 0)
-            {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(destA);
-                    if(FU.request_success)
-                    {
-                        buf.destval = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
-                {
-                    total_stalls++;
-                    data_stalls++;
-                    buf.invalid = true;
-                    ready = false;
-                    return buf;
-                }
-            }
-            else
-            {
-                buf.destval = rf.read(destA);
-            }
-            if (rf.isWriting[src1A] != 0)
-            {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(src1A);
-                    if(FU.request_success)
-                    {
-                        buf.srcval1 = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
-                {
-                    total_stalls++;
-                    data_stalls++;
-                    buf.invalid = true;
-                    ready = false;
-                    return buf;
-                }
-            }
-            else
-            {
-                buf.srcval1 = rf.read(src1A);
-            }
-            
+
             //base register
-            buf.src1 = src1A;
-            buf.validsrc1 = false;
+            buf.src1 = registerFetch(src1A);
 
             //src2 is invalid
-            buf.validsrc2 = false;
+            buf.src2.valid = false;
 
-            //store will read from dest
-            buf.dest = destA;
-            buf.validdest = false;
+            //register to be stored
+            buf.dest = registerFetch(destA);
+            if(!ENABLE_OPEARND_FORWARDING)
+            {
+                if((!buf.src1.valid) || (!buf.dest.valid))
+                {
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
 
             //offset will be given in src2A
             int s = src2A >> 3;
@@ -513,25 +316,11 @@ IDEXBuffer IDRFModule::execute()
             int destA = (instruction >> 8) & 0xf;
             rf.getBusy();
             rf.reset();
-            if (rf.isWriting[destA] != 0)
+            
+            buf.dest = registerFetch(destA);
+            if(!ENABLE_OPEARND_FORWARDING)
             {
-                if(ENABLE_OPEARND_FORWARDING)
-                {
-                    int tval = FU.request(destA);
-                    if(FU.request_success)
-                    {
-                        buf.destval = tval;
-                    }
-                    else
-                    {
-                        total_stalls++;
-                        data_stalls++;
-                        buf.invalid = true;
-                        ready = false;
-                        return buf;
-                    }
-                }
-                else
+                if((!buf.dest.valid))
                 {
                     total_stalls++;
                     data_stalls++;
@@ -540,13 +329,6 @@ IDEXBuffer IDRFModule::execute()
                     return buf;
                 }
             }
-            else
-            {
-                buf.destval = rf.read(destA);
-            }
-            
-            buf.dest = destA;
-            buf.validdest = false;
 
         }
     }
@@ -567,4 +349,36 @@ IDEXBuffer IDRFModule::execute()
 bool IDRFModule::resolveBranch(int reg)
 {
     return (reg == rf.read(0));
+}
+
+RS IDRFModule::registerFetch(int tag) {
+    //fetch tag
+    RS rs;
+    rs.tag = tag;
+    if(rf.isWriting[tag] != 0)
+    {
+        if(ENABLE_OPEARND_FORWARDING)
+        {
+            int tval = FU.request(tag);
+            if(FU.request_success)
+            {
+                rs.data = tval;
+                rs.valid = true;
+            }
+            else
+            {
+                rs.valid = false;
+            }
+        }
+        else
+        {
+            rs.valid = false;
+        }
+    }
+    else
+    {
+        rs.data = rf.read(tag);
+        rs.valid = true;
+    }
+    return rs;
 }

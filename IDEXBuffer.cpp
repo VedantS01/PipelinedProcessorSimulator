@@ -46,15 +46,15 @@ IDEXBuffer::IDEXBuffer()
 
     //in case of arithmetic and logic instructions, this is first operand
     //in case of load store, this register is base
-    validsrc1 = false; //will be used in operator forwarding
+    src1.valid = false; //will be used in operator forwarding
 
     //in case of arithmetic and logic instructions, this is second operand
-    //in case of load store, src2 and srcval2 are not valid
-    validsrc2 = false; //will be used in operator forwarding
+    //in case of load store, src2 and src2.data are not valid
+    src2.valid = false; //will be used in operator forwarding
 
     //will denote write_to register in arithmetic and logic operations and load instruction
-    //in case of store instruction or bneq instruction, dest is the concerned register and destval is its value;
-    validdest = false; //will be used in operator forwarding
+    //in case of store instruction or bneq instruction, dest.tag is the concerned register and dest.data is its value;
+    dest.valid = false; //will be used in operator forwarding
 
     //in load store, offset stores the immediate 4  value of address offset
     offset = 0;

@@ -22,112 +22,433 @@ EMBuffer EXModule::execute()
     }
 
     buf.npc = idexBuf.npc;
-    total_instructions++;
     int subop = idexBuf.subop;
     if(idexBuf.arithmetic)   //mode=0
     {
-        arithmetic_instructions++;
         int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
             //incrementer
-            val1 = idexBuf.destval;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
             val2 = inc.read();
             val = alu.adder(val1, val2, 0);
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
             //multiplier
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
             //TODO: sign extend and etc in case result is not coming right
             val = alu.mul(val1, val2);
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
             //subtract
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
-            //TODO: sign extend and etc in case result is not coming right
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
+
             val = alu.adder(val1, val2, 1);
         }
         else //subop=0
         {
             //add
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
-            //TODO: sign extend and etc in case result is not coming right
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    cout << "count" << endl;
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
             val = alu.adder(val1, val2, 0);
         }
         buf.writeToRegister = true;
-        buf.dest = idexBuf.dest;
+        buf.dest = idexBuf.dest.tag;
         buf.aluOutput = val;
         buf.destval = val;
         buf.validdest = true;
+        arithmetic_instructions++;
     }
     else if(idexBuf.logical)   //mode=1
     {
-        logical_instructions++;
         int val1, val2, val;
         if( (subop >> 1) & (subop & 1) ) //subop=3
         {
             //xor
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
             val = alu.XOR(val1, val2);
         }
         else if( (subop>>1) & (!(subop&1)) ) //subop=2
         {
             //not
-            val1 = idexBuf.srcval1;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
             val = alu.NOT(val1);
         }
         else if( (!(subop>>1)) & (subop&1)) //subop=1
         {
             //or
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
             val = alu.OR(val1, val2);
         }
         else //subop=0
         {
             //and
-            val1 = idexBuf.srcval1;
-            val2 = idexBuf.srcval2;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            if(!idexBuf.src2.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src2.tag);
+                if(FU.request_success)
+                {
+                    val2 = tval;
+                    idexBuf.src2.data = tval;
+                    idexBuf.src2.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val2 = idexBuf.src2.data;
             val = alu.AND(val1, val2);
         }
         buf.writeToRegister = true;
-        buf.dest = idexBuf.dest;
+        buf.dest = idexBuf.dest.tag;
         buf.aluOutput = val;
         buf.destval = val;
         buf.validdest = true;
+        logical_instructions++;
     }
     else if(idexBuf.load)
         {
-            data_instructions++;
             // buf.writeToRegister = false;
             buf.load = true;
             //calc effective address
-            int val1 = idexBuf.srcval1;
+            int val1;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
             int val2 = idexBuf.offset;
             int val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
-            buf.dest = idexBuf.dest;
-            buf.validdest = idexBuf.validdest;
+            buf.dest = idexBuf.dest.tag;
+            buf.validdest = idexBuf.dest.valid;
+            data_instructions++;
         }
     else if(idexBuf.store)
         {
-            data_instructions++;
             // buf.writeToRegister = false;
             buf.store = true;
             //calc effective address
-            int val1 = idexBuf.srcval1;
-            int val2 = idexBuf.offset;
-            int val = alu.adder(val1, val2, 0);
+            int val1, val2, val;
+            val2 = idexBuf.offset;
+            if(!idexBuf.src1.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.src1.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.src1.data = tval;
+                    idexBuf.src1.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.src1.data;
+            val = alu.adder(val1, val2, 0);
             buf.aluOutput = val;
-            buf.dest = idexBuf.dest;
-            buf.destval = idexBuf.destval;
-            buf.validdest = idexBuf.validdest;
+            buf.dest = idexBuf.dest.tag;
+            buf.destval = idexBuf.dest.data;
+            buf.validdest = idexBuf.dest.valid;
+            data_instructions++;
         }
     else if(idexBuf.jump)
         {
@@ -144,6 +465,7 @@ EMBuffer EXModule::execute()
             pc.write(val);
 
             //generate go flush signal
+            total_instructions++;
             FLUSH = true;
             control_stalls += 2;
             total_stalls += 2;
@@ -156,7 +478,28 @@ EMBuffer EXModule::execute()
             control_instructions++;
             // buf.writeToRegister = false;
             //compare with 0
-            int val1 = idexBuf.destval;
+            int val1;
+            if(!idexBuf.dest.valid) {
+                //only possible in case of operand forwarding
+                int tval = FU.request(idexBuf.dest.tag);
+                if(FU.request_success)
+                {
+                    val1 = tval;
+                    idexBuf.dest.data = val1;
+                    idexBuf.dest.valid = true;
+                }
+                else
+                {
+                    //stall;
+                    total_stalls++;
+                    data_stalls++;
+                    buf.invalid = true;
+                    ready = false;
+                    return buf;
+                }
+            }
+            else
+                val1 = idexBuf.dest.data;
             int val2 = 0;
             if(val1 == val2) {
                 //calc effective address
@@ -187,6 +530,7 @@ EMBuffer EXModule::execute()
             }
 
             //generate go flush signal
+            total_instructions++;
             FLUSH = true;
             control_stalls += 2;
             total_stalls += 2;
@@ -197,12 +541,15 @@ EMBuffer EXModule::execute()
     else if (idexBuf.HALT_SIGNAL)
         {
             halt_instructions++;
+            total_instructions++;
             buf.HALT_SIGNAL = true;
             buf.invalid = false;
             ready = false;
             idexBuf.invalid = true;
             return buf;
         }
+        
+    total_instructions++;
     buf.invalid = false;
     ready = true;
     return buf;
