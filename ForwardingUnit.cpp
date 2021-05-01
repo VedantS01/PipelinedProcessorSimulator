@@ -2,7 +2,7 @@
  * 
  *  ForwardingUnit.cpp      :       Implementation of Register Forwarding Unit
  * 
- *  Version                 :       1.0
+ *  Version                 :       2.0
  * 
  *  AUTHOR                  :       Vedant Saboo, CS19B074
  * 
@@ -16,18 +16,6 @@ int ForwardingUnit::request(int tag) {
     //check in IDEX
     if(!IDEX.invalid)
     {
-        // if(IDEX.validsrc1 && IDEX.src1 == tag) 
-        // {
-        //     request_success = true;
-        //     IDEX.validsrc1 = false; //do not reference from here anymore
-        //     return IDEX.srcval1;
-        // }
-        // if(IDEX.validsrc2 && IDEX.src2 == tag) 
-        // {
-        //     request_success = true;
-        //     IDEX.validsrc2 = false; //do not reference from here anymore
-        //     return IDEX.srcval2;
-        // }
         if(IDEX.dest.valid && IDEX.dest.tag == tag) 
         {
             request_success = true;
@@ -68,14 +56,6 @@ void ForwardingUnit::renderInvalidIfValid(int tag) {
     //check in IDEX
     if(!IDEX.invalid)
     {
-        // if(IDEX.validsrc1 && IDEX.src1 == tag) 
-        // {
-        //     IDEX.validsrc1 = false; //do not reference from here anymore
-        // }
-        // if(IDEX.validsrc2 && IDEX.src2 == tag) 
-        // {
-        //     IDEX.validsrc2 = false; //do not reference from here anymore
-        // }
         if(IDEX.dest.valid && IDEX.dest.tag == tag) 
         {
             IDEX.dest.valid = false; //do not reference from here anymore
